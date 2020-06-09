@@ -30,10 +30,14 @@ import org.locationtech.geomesa.index.planning.LocalQueryRunner.{ArrowDictionary
 import org.locationtech.geomesa.utils.index.ByteArrays
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
+/**
+* 使用Cassandra存储需要实现相关IndexAdapter
+*/
 class CassandraIndexAdapter(ds: CassandraDataStore) extends IndexAdapter[CassandraDataStore] with StrictLogging {
 
   override val tableNameLimit: Option[Int] = Some(CassandraIndexAdapter.TableNameLimit)
 
+  //创建索引表
   override def createTable(
       index: GeoMesaFeatureIndex[_, _],
       partition: Option[String],
@@ -77,6 +81,7 @@ class CassandraIndexAdapter(ds: CassandraDataStore) extends IndexAdapter[Cassand
     }
   }
 
+  //创建查询计划
   override def createQueryPlan(strategy: QueryStrategy): CassandraQueryPlan = {
     import org.locationtech.geomesa.index.conf.QueryHints.RichHints
 

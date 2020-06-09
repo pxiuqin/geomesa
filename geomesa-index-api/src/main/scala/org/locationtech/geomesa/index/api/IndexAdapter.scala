@@ -19,7 +19,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 /**
   * Interface between generic methods and back-end specific code
-  *
+  * 索引写入适配器
   * @tparam DS data store binding
   */
 trait IndexAdapter[DS <: GeoMesaDataStore[DS]] {

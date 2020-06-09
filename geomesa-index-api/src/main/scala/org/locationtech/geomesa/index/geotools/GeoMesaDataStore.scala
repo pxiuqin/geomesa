@@ -451,7 +451,7 @@ abstract class GeoMesaDataStore[DS <: GeoMesaDataStore[DS]](val config: GeoMesaD
   /**
     * Internal method to get a feature writer without reloading the simple feature type. We don't expose this
     * widely as we want to ensure that the sft has been loaded from our catalog
-    *
+    * 获得Fature写入对象
     * @param sft simple feature type
     * @param filter if defined, will do an updating write, otherwise will do an appending write
     * @return

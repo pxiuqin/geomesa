@@ -26,6 +26,9 @@ import org.opengis.filter.identity.FeatureId
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
+/**
+* 继承goetools中的SimpleFeatureStore
+*/
 class GeoMesaFeatureStore(ds: DataStore with HasGeoMesaStats, sft: SimpleFeatureType, runner: QueryRunner)
     extends GeoMesaFeatureSource(ds, sft, runner) with SimpleFeatureStore {
 

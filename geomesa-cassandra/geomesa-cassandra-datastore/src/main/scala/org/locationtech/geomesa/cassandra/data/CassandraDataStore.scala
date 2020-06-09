@@ -67,6 +67,7 @@ class CassandraDataStore(val session: Session, config: CassandraDataStoreConfig)
     val indices = Seq.newBuilder[IndexId]
     val tableNameKeys = Seq.newBuilder[(String, String)]
 
+    //sft中包括关于索引内容
     sft.getIndices.foreach {
       case id if id.name == IdIndex.name =>
         require(id.version == 1, s"Expected index version of 1 but got: $id")

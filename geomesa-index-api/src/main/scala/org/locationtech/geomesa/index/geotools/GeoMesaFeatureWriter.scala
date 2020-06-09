@@ -29,6 +29,9 @@ import org.opengis.filter.Filter
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.NonFatal
 
+/**
+* 继承geotools中的SimpleFeatureWriter，用于对SF的写入操作
+*/
 trait GeoMesaFeatureWriter[DS <: GeoMesaDataStore[DS]] extends SimpleFeatureWriter with Flushable with LazyLogging {
 
   import scala.collection.JavaConverters._
