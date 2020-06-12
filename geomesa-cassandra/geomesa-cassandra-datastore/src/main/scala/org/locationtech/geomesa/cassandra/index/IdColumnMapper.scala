@@ -18,6 +18,7 @@ import org.locationtech.geomesa.index.api._
 import org.locationtech.geomesa.utils.cache.CacheKeyGenerator
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
+//基于FeautreID的操作
 object IdColumnMapper {
 
   private val cache = Caffeine.newBuilder().build(

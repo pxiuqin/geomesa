@@ -12,6 +12,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.reflect.ClassTag
 
+//基于GroupBy来完成统计
 class GroupBy[T](val sft: SimpleFeatureType, val property: String, val stat: String)(implicit val ct: ClassTag[T])
     extends Stat {
 

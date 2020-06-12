@@ -48,7 +48,7 @@ object CassandraQueryPlan {
   }
 }
 
-// plan that will not actually scan anything
+// plan that will not actually scan anything [Empty空查询计划]
 case class EmptyPlan(filter: FilterStrategy, reducer: Option[FeatureReducer] = None) extends CassandraQueryPlan {
   override val tables: Seq[String] = Seq.empty
   override val ranges: Seq[Statement] = Seq.empty
@@ -75,6 +75,7 @@ case class StatementPlan(
     projection: Option[QueryReferenceSystems]
   ) extends CassandraQueryPlan {
 
+  //基于ds批量查询
   override def scan(ds: CassandraDataStore): CloseableIterator[Row] =
     CassandraBatchScan(this, ds.session, ranges, numThreads, ds.config.queries.timeout.map(Timeout.apply))
 }

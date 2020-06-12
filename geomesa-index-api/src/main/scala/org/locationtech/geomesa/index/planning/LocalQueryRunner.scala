@@ -64,7 +64,7 @@ abstract class LocalQueryRunner(stats: GeoMesaStats, authProvider: Option[Author
   protected def features(sft: SimpleFeatureType, filter: Option[Filter]): CloseableIterator[SimpleFeature]
 
   override def runQuery(sft: SimpleFeatureType, original: Query, explain: Explainer): CloseableIterator[SimpleFeature] = {
-    val query = configureQuery(sft, original)
+    val query = configureQuery(sft, original)   //配置查询参数
 
     explain.pushLevel(s"$name query: '${sft.getTypeName}' ${org.locationtech.geomesa.filter.filterToString(query.getFilter)}")
     explain(s"bin[${query.getHints.isBinQuery}] arrow[${query.getHints.isArrowQuery}] " +
@@ -273,6 +273,7 @@ object LocalQueryRunner {
     }
   }
 
+  //基于Arrow格式的数据来完成转换的
   private def arrowTransform(
       original: CloseableIterator[SimpleFeature],
       sft: SimpleFeatureType,

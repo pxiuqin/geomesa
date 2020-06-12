@@ -108,6 +108,7 @@ object StatSerializer {
     private val TopKByteV2: Byte            = 15
     private val TopKByte: Byte              = 24
 
+    //写入不同的统计序列化数据
     private def write(output: Output, sft: SimpleFeatureType, stat: Stat): Unit = {
       stat match {
         case s: CountStat           => output.writeByte(CountByte);           writeCount(output, s)

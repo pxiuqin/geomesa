@@ -101,6 +101,8 @@ class CassandraIndexAdapter(ds: CassandraDataStore) extends IndexAdapter[Cassand
       val sort = hints.getSortFields
       val max = hints.getMaxFeatures
       val project = hints.getProjection
+
+      //构建一个查询语句的执行计划
       StatementPlan(filter, tables, statements, threads, ecql, rowsToFeatures, reducer, sort, max, project)
     }
   }
@@ -116,6 +118,7 @@ object CassandraIndexAdapter extends LazyLogging {
   val TableNameLimit = 48
 
   def statement(keyspace: String, table: String, criteria: Seq[ColumnSelect]): Select = {
+    //构建Cassandra的查询语句
     val select = QueryBuilder.select.all.from(keyspace, table)
     criteria.foreach { c =>
       if (c.start == null) {
@@ -174,6 +177,7 @@ object CassandraIndexAdapter extends LazyLogging {
     }
   }
 
+  //Cassandra下的索引写入方法
   class CassandraIndexWriter(
       ds: CassandraDataStore,
       indices: Seq[GeoMesaFeatureIndex[_, _]],

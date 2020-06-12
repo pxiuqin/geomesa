@@ -59,7 +59,7 @@ trait QueryRunner {
 
     val query = new Query(original) // note: this ends up sharing a hints object between the two queries
 
-    // query rewriting
+    // query rewriting [重新构建Query并缓存]
     interceptors(sft).foreach { interceptor =>
       interceptor.rewrite(query)
       QueryRunner.logger.trace(s"Query rewritten by $interceptor to: $query")
@@ -87,6 +87,7 @@ trait QueryRunner {
 
     // add the bbox from the density query to the filter, if there is no more restrictive filter
     query.getHints.getDensityEnvelope.foreach { env =>
+      //获取相关的BBox
       val geom = query.getHints.getDensityGeometry.getOrElse(sft.getGeomField)
       val geoms = FilterHelper.extractGeometries(query.getFilter, geom)
       if (geoms.isEmpty || geoms.exists(g => !env.contains(g.getEnvelopeInternal))) {
