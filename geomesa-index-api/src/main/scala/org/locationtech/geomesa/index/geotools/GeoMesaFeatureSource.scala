@@ -34,6 +34,7 @@ import org.opengis.util.ProgressListener
 import scala.collection.JavaConversions._
 import scala.util.Try
 
+//GeoMesa实现的FS
 class GeoMesaFeatureSource(val ds: DataStore with HasGeoMesaStats,
                            val sft: SimpleFeatureType,
                            private [geotools] val runner: QueryRunner)
@@ -139,6 +140,7 @@ object GeoMesaFeatureSource {
   }
 
   /*_*/
+  //基于缓存继承了SF集合
   class CachingFeatureCollection(delegate: SimpleFeatureCollection) extends SimpleFeatureCollection {
   /*_*/
 

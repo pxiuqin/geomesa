@@ -26,22 +26,24 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
 import org.opengis.filter.expression.Expression
 
+//Density查询的构建结果过程
 trait DensityScan extends AggregatingScan[DensityScanResult] {
 
   // we snap each point into a pixel and aggregate based on that
   protected var renderer: GeometryRenderer = _
 
+  //结果封装
   override protected def createResult(
       sft: SimpleFeatureType,
       transform: Option[SimpleFeatureType],
       batchSize: Int,
       options: Map[String, String]): DensityScanResult = {
     val geom = options.getOrElse(DensityScan.Configuration.GeometryOpt, sft.getGeometryDescriptor.getLocalName)
-    val renderer = DensityScan.getRenderer(sft, geom, options.get(DensityScan.Configuration.WeightOpt))
+    val renderer = DensityScan.getRenderer(sft, geom, options.get(DensityScan.Configuration.WeightOpt))  //基于geom的类型进行投影操作
     val bounds = options(DensityScan.Configuration.EnvelopeOpt).split(",").map(_.toDouble)
-    val envelope = new Envelope(bounds(0), bounds(1), bounds(2), bounds(3))
+    val envelope = new Envelope(bounds(0), bounds(1), bounds(2), bounds(3))  //封装成一个bound
     val Array(width, height) = options(DensityScan.Configuration.GridOpt).split(",").map(_.toInt)
-    new DensityScanResult(renderer, new RenderingGrid(envelope, width, height))
+    new DensityScanResult(renderer, new RenderingGrid(envelope, width, height))  //返回一个投影后的数据
   }
 
   override protected def defaultBatchSize: Int =
@@ -91,6 +93,7 @@ object DensityScan extends LazyLogging {
 
   /**
     * Encodes a sparse matrix into a byte array
+    * 对Grid对象进行编码操作
     */
   def encodeResult(result: RenderingGrid): Array[Byte] = {
     val output = KryoFeatureSerialization.getOutput(null)
@@ -108,6 +111,7 @@ object DensityScan extends LazyLogging {
   /**
     * Returns a mapping of simple features (returned from a density query) to weighted points in the
     * form of (x, y, weight)
+    * 解码字节为Grid
     */
   def decodeResult(envelope: Envelope, gridWidth: Int, gridHeight: Int): GridIterator =
     decodeResult(new GridSnap(envelope, gridWidth, gridHeight))
@@ -117,7 +121,7 @@ object DensityScan extends LazyLogging {
     */
   def decodeResult(gridSnap: GridSnap)(sf: SimpleFeature): Iterator[(Double, Double, Double)] = {
     val result = sf.getUserData.get(DensityValueKey).asInstanceOf[Array[Byte]]
-    val input = KryoFeatureDeserialization.getInput(result, 0, result.length)
+    val input = KryoFeatureDeserialization.getInput(result, 0, result.length)  //反序列化
     new Iterator[(Double, Double, Double)]() {
       private var x = 0.0
       private var colCount = 0
@@ -125,7 +129,7 @@ object DensityScan extends LazyLogging {
       override def next(): (Double, Double, Double) = {
         if (colCount == 0) {
           x = gridSnap.x(input.readInt(true))
-          colCount = input.readInt(true)
+          colCount = input.readInt(true)  //标识了总数
         }
         val y = gridSnap.y(input.readInt(true))
         val weight = input.readDouble()
@@ -198,6 +202,7 @@ object DensityScan extends LazyLogging {
     geom
   }
 
+  //Density类型查询的结果
   class DensityScanResult(renderer: GeometryRenderer, grid: RenderingGrid) extends AggregatingScan.Result {
 
     override def init(): Unit = {}

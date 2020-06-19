@@ -34,6 +34,7 @@ class GeoMesaFeatureStore(ds: DataStore with HasGeoMesaStats, sft: SimpleFeature
 
   private var transaction: Transaction = Transaction.AUTO_COMMIT
 
+  //批量写入Features数据
   override def addFeatures(collection: FeatureCollection[SimpleFeatureType, SimpleFeature]): jList[FeatureId] = {
     if (collection.isEmpty) {
       return List.empty[FeatureId]

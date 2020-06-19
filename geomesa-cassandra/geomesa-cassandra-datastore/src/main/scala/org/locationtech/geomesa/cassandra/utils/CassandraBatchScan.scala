@@ -24,6 +24,7 @@ private class CassandraBatchScan(session: Session, ranges: Seq[Statement], threa
     CloseableIterator(session.execute(range).iterator())
 }
 
+//基于Cassandra的批量获取
 object CassandraBatchScan {
 
   private val Sentinel: Row = new AbstractGettableData(ProtocolVersion.NEWEST_SUPPORTED) with Row {

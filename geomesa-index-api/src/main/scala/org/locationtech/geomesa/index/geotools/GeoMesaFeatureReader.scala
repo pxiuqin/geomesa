@@ -23,6 +23,7 @@ import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.locationtech.geomesa.utils.stats.{MethodProfiling, Timings, TimingsImpl}
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
+//GeoMesa实现的FR
 class GeoMesaFeatureReader private (sft: SimpleFeatureType, qp: QueryRunner, query: Query, timeout: Option[Long])
     extends SimpleFeatureReader {
 

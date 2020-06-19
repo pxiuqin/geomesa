@@ -10,6 +10,7 @@ package org.locationtech.geomesa.index.utils
 
 import org.opengis.feature.simple.SimpleFeature
 
+//Feature采样处理
 object FeatureSampler {
   /**
    * Returns a sampling function that will indicate if a feature should be kept or discarded

@@ -205,7 +205,7 @@ object LocalQueryRunner {
 
   /**
     * Transform plain features into the appropriate return type, based on the hints
-    *
+    * 转换明文的Features
     * @param sft simple feature type being queried
     * @param features plain, untransformed features matching the simple feature type
     * @param hints query hints
@@ -231,7 +231,7 @@ object LocalQueryRunner {
     } else if (hints.isArrowQuery) {
       arrowTransform(sampled, sft, transform, hints, arrow)
     } else if (hints.isDensityQuery) {
-      val Some(envelope) = hints.getDensityEnvelope
+      val Some(envelope) = hints.getDensityEnvelope  //包围盒
       val Some((width, height)) = hints.getDensityBounds
       val geom = DensityScan.getDensityGeometry(sft, hints)
       densityTransform(sampled, sft, geom, envelope, width, height, hints.getDensityWeight)
@@ -245,6 +245,7 @@ object LocalQueryRunner {
     }
   }
 
+  //基于二进制数据的查询转换
   private def binTransform(
       features: CloseableIterator[SimpleFeature],
       sft: SimpleFeatureType,
@@ -383,6 +384,7 @@ object LocalQueryRunner {
     }
   }
 
+  //desity查询转换
   private def densityTransform(
       features: CloseableIterator[SimpleFeature],
       sft: SimpleFeatureType,
@@ -397,10 +399,11 @@ object LocalQueryRunner {
 
     val sf = new ScalaSimpleFeature(DensityScan.DensitySft, "", Array(GeometryUtils.zeroPoint))
     // Return value in user data so it's preserved when passed through a RetypingFeatureCollection
-    sf.getUserData.put(DensityScan.DensityValueKey, DensityScan.encodeResult(grid))
+    sf.getUserData.put(DensityScan.DensityValueKey, DensityScan.encodeResult(grid))   //给grid做编码
     CloseableIterator(Iterator(sf))
   }
 
+  //统计操作转换
   private def statsTransform(features: CloseableIterator[SimpleFeature],
                              sft: SimpleFeatureType,
                              transform: Option[(String, SimpleFeatureType)],
@@ -466,7 +469,7 @@ object LocalQueryRunner {
     if (!(percent > 0 && percent < 1f)) {
       throw new IllegalArgumentException(s"Sampling must be a percentage between (0, 1): $percent")
     }
-    val nth = (1 / percent.toFloat).toInt
+    val nth = (1 / percent.toFloat).toInt   //给定一个百分比
     val field = by.map { name =>
       val i = sft.indexOf(name)
       if (i == -1) {

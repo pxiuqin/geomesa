@@ -15,7 +15,7 @@ import scala.math.abs
 
 /**
   * Snaps points to cells of a defined grid
-  *
+  * 针对点做投影计算到网格
   * @param env bounding envelope
   * @param xSize number of x cells in the grid
   * @param ySize number of y cells in the grid
@@ -37,7 +37,7 @@ class GridSnap(env: Envelope, xSize: Int, ySize: Int) {
 
   /**
    * Computes the X ordinate of the i'th grid column.
-   *
+   * 计算X坐标上的指定列下标的Grid
    * @param i the index of a grid column
    * @return the X ordinate of the column
    */
@@ -45,7 +45,7 @@ class GridSnap(env: Envelope, xSize: Int, ySize: Int) {
 
   /**
    * Computes the Y ordinate of the i'th grid row.
-   *
+   * 同理计算Y坐标上的指定行下标的Grid
    * @param j the index of a grid row
    * @return the Y ordinate of the row
    */
@@ -53,7 +53,7 @@ class GridSnap(env: Envelope, xSize: Int, ySize: Int) {
 
   /**
    * Computes the column index of an X ordinate.
-   *
+   * 给定X坐标计算相应Grid的列下标
    * @param x the X ordinate
    * @return the column index
    */
@@ -67,7 +67,7 @@ class GridSnap(env: Envelope, xSize: Int, ySize: Int) {
 
   /**
    * Computes the column index of an Y ordinate.
-   *
+   * 给定Y坐标计算相应Grid的行下标
    * @param y the Y ordinate
    * @return the column index
    */
@@ -79,12 +79,13 @@ class GridSnap(env: Envelope, xSize: Int, ySize: Int) {
     }
   }
 
+  //单点投影转换
   def snap(x: Double, y: Double): (Double, Double) = (this.x(i(x)), this.y(j(y)))
 
   /**
     * Generate a sequence of snapped points between two given snapped coordinates using Bresenham's Line Algorithm.
     * Will not return any duplicate points, and will always include the start and end points
-    *
+    * 利用布雷森汉姆直线算法，像素点是整数，而自然直线并不是只包含整数点，所以需要用整数像素点拟合直线
     * @param x0 x0
     * @param y0 y0
     * @param x1 x1

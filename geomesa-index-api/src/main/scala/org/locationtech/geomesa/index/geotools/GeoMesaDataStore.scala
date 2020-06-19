@@ -367,7 +367,7 @@ abstract class GeoMesaDataStore[DS <: GeoMesaDataStore[DS]](val config: GeoMesaD
    * @return featureStore, suitable for reading and writing
    */
   override def getFeatureSource(typeName: String): GeoMesaFeatureStore = {
-    val sft = getSchema(typeName)
+    val sft = getSchema(typeName)  //获取SFT
     if (sft == null) {
       throw new IOException(s"Schema '$typeName' has not been initialized. Please call 'createSchema' first.")
     }

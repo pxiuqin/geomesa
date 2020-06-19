@@ -18,7 +18,7 @@ import scala.util.control.NonFatal
 
 /**
   * Renders geometries to a fixed-size grid of pixels
-  *
+  * 对空间对象进行投影成一个网格操作
   * @param env the rendering envelope
   * @param xSize x pixel count
   * @param ySize y pixel count
@@ -31,7 +31,7 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
   private val xMin = env.getMinX
   private val xMax = env.getMaxX
 
-  private val wide = xMax - xMin > 360d
+  private val wide = xMax - xMin > 360d   //？是不是360度
 
   private var count = 0L
 
@@ -58,7 +58,7 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
   def render(multiPoint: MultiPoint, weight: Double): Unit = {
     var i = 0
     while (i < multiPoint.getNumGeometries) {
-      render(multiPoint.getGeometryN(i).asInstanceOf[Point], weight)
+      render(multiPoint.getGeometryN(i).asInstanceOf[Point], weight)  //多个点情况，分别处理每个点
       i += 1
     }
     count += (1 - i)
@@ -105,7 +105,7 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
             case NonFatal(e) => logger.error(s"Error intersecting line string [$p0 $p1] with ${grid.envelope}", e)
           }
         } else {
-          val bresenham = grid.bresenhamLine(i0.head, j0, i1.head, j1)
+          val bresenham = grid.bresenhamLine(i0.head, j0, i1.head, j1)  //调用布雷森汉姆直线算法
           // check the first point for overlap with last line segment
           val (iF, jF) = bresenham.next
           if (iF != iN || jF != jN) {
@@ -151,7 +151,7 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
   def render(multiLineString: MultiLineString, weight: Double): Unit = {
     var i = 0
     while (i < multiLineString.getNumGeometries) {
-      render(multiLineString.getGeometryN(i).asInstanceOf[LineString], weight)
+      render(multiLineString.getGeometryN(i).asInstanceOf[LineString], weight)  //转换成单线操作
       i += 1
     }
     count += (1 - i)
@@ -253,7 +253,7 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
       case g: GeometryCollection =>
         var i = 0
         while (i < g.getNumGeometries) {
-          render(g.getGeometryN(i), weight)
+          render(g.getGeometryN(i), weight)  //取出每种来单独处理
           i += 1
         }
         count += (1 - i)
@@ -293,13 +293,13 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
   /**
     * Translate a point into the output envelope. If the envelope is larger than 360 degrees, points may
     * be rendered more than once
-    *
+    * 针对经度进行转换
     * @param x longitude
     * @return
     */
   private def translate(x: Double): Seq[Int] = {
     if (x < xMin) {
-      val xt = x + (360d * math.ceil((xMin - x) / 360))
+      val xt = x + (360d * math.ceil((xMin - x) / 360))  //ceil函数是向上取整
       if (xt > xMax) { Seq.empty } else { widen(xt) }
     } else if (x > xMax) {
       val xt = x - (360d * math.ceil((x - xMax) / 360))
@@ -316,10 +316,11 @@ class RenderingGrid(env: Envelope, xSize: Int, ySize: Int) extends LazyLogging {
     * @return
     */
   private def widen(x: Double): Seq[Int] = {
+    //是大于360度
     if (wide) {
       val seq = Seq.newBuilder[Int]
       // start with the smallest x value greater than xMin
-      var xup = x - 360d * math.floor((x - xMin) / 360)
+      var xup = x - 360d * math.floor((x - xMin) / 360) //floor向下取整
       while (xup <= xMax) {
         seq += grid.i(xup)
         xup += 360d
