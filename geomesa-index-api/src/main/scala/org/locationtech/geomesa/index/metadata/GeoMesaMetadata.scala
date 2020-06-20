@@ -12,7 +12,7 @@ import java.io.Closeable
 
 /**
  * GeoMesa Metadata/Catalog abstraction using key/value String pairs storing
- * them on a per-typeName basis
+ * them on a per-typeName basis 【GeoMesa的元数据类】
  */
 trait GeoMesaMetadata[T] extends Closeable {
 
@@ -113,7 +113,7 @@ trait GeoMesaMetadata[T] extends Closeable {
 
 object GeoMesaMetadata {
 
-  // Metadata keys
+  // Metadata keys【元数据中key的类型】
   val AttributesKey      = "attributes"
   val VersionKey         = "version"
   val StatsGenerationKey = "stats-date"

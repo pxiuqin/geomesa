@@ -27,6 +27,7 @@ import org.locationtech.geomesa.utils.geotools.converters.FastConverter
 import org.locationtech.geomesa.utils.stats.IndexCoverage
 import org.opengis.feature.simple.SimpleFeatureType
 
+//基于Cassandra实现的DS
 class CassandraDataStore(val session: Session, config: CassandraDataStoreConfig)
     extends GeoMesaDataStore[CassandraDataStore](config) with LocalLocking {
 
@@ -60,12 +61,13 @@ class CassandraDataStore(val session: Session, config: CassandraDataStoreConfig)
     super.preSchemaUpdate(sft, previous)
   }
 
+  //转换各类索引，并保存到元数据中
   override protected def transitionIndices(sft: SimpleFeatureType): Unit = {
-    val dtg = sft.getDtgField.toSeq
-    val geom = Option(sft.getGeomField).toSeq
+    val dtg = sft.getDtgField.toSeq //时间字段
+    val geom = Option(sft.getGeomField).toSeq  //空间类型字段
 
-    val indices = Seq.newBuilder[IndexId]
-    val tableNameKeys = Seq.newBuilder[(String, String)]
+    val indices = Seq.newBuilder[IndexId]  //构建索引ID
+    val tableNameKeys = Seq.newBuilder[(String, String)]  //构建TableName和Key
 
     //sft中包括关于索引内容
     sft.getIndices.foreach {
@@ -92,7 +94,7 @@ class CassandraDataStore(val session: Session, config: CassandraDataStoreConfig)
         require(id.version == 1, s"Expected index version of 1 but got: $id")
         indices += id.copy(attributes = geom)
 
-      case id if id.name == AttributeIndex.name =>
+      case id if id.name == AttributeIndex.name =>    //基于属性的索引
         require(id.version <= 2, s"Expected index version of 1 or 2 but got: $id")
         val fields = geom ++ dtg
         sft.getAttributeDescriptors.asScala.foreach { d =>

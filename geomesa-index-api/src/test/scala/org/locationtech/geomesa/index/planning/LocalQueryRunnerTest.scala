@@ -44,7 +44,7 @@ class LocalQueryRunnerTest extends Specification {
     Array("bob",     30,   "2014-01-01T12:00:00.000Z", "POINT(47.0 49.0)"),
     Array("charles", null, "2014-01-01T12:30:00.000Z", "POINT(48.0 49.0)")
   ).map {
-    entry => ScalaSimpleFeature.create(sft, entry.head.toString, entry: _*)
+    entry => ScalaSimpleFeature.create(sft, entry.head.toString, entry: _*)  //构建一个SF对象
   }
 
   val runner: LocalQueryRunner = new LocalQueryRunner(NoopStats, None) {

@@ -20,7 +20,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import scala.collection.immutable.ListMap
 
 /**
-  * The MinMax stat merely returns the min/max of an attribute's values.
+  * The MinMax stat merely returns the min/max of an attribute's values.【统计最大和最小值】
   * Works with dates, integers, longs, doubles, and floats.
   *
   * @param sft simple feature type
@@ -192,6 +192,7 @@ object MinMax {
     override val min: Geometry = gf.createPoint(new Coordinate(-180.0, -90.0))
     override val max: Geometry = gf.createPoint(new Coordinate(180.0, 90.0))
 
+    //比较地理对象的最小值
     override def min(left: Geometry, right: Geometry): Geometry = {
       val (lx, ly) = { val e = left.getEnvelopeInternal; (e.getMinX, e.getMinY) }
       val (rx, ry) = { val e = right.getEnvelopeInternal; (e.getMinX, e.getMinY) }
@@ -208,6 +209,7 @@ object MinMax {
       }
     }
 
+    //比较地理对象的最大值
     override def max(left: Geometry, right: Geometry): Geometry = {
       val (lx, ly) = { val e = left.getEnvelopeInternal; (e.getMaxX, e.getMaxY) }
       val (rx, ry) = { val e = right.getEnvelopeInternal; (e.getMaxX, e.getMaxY) }

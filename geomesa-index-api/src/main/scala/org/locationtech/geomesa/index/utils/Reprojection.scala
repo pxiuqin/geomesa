@@ -20,6 +20,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem
 
 /**
   * Reproject the geometries in a simple feature to a different CRS
+  * 重投影地理对象到一个CRS
   */
 trait Reprojection {
   def apply(feature: SimpleFeature): SimpleFeature
@@ -31,7 +32,7 @@ object Reprojection {
 
   /**
     * Create a reprojection function
-    *
+    * 投影
     * @param returnSft simple feature type being returned
     * @param crs crs information from a query
     * @return

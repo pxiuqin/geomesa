@@ -13,6 +13,7 @@ import org.locationtech.geomesa.utils.index.IndexMode.IndexMode
 
 import scala.util.control.NonFatal
 
+//索引ID
 case class IndexId(name: String, version: Int, attributes: Seq[String], mode: IndexMode = IndexMode.ReadWrite) {
 
   lazy val encoded: String = s"$name:$version:${mode.flag}:${attributes.mkString(":")}"

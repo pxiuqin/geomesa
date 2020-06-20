@@ -110,7 +110,7 @@ object Transform {
      * @return
      */
     def apply(sft: SimpleFeatureType, transforms: Seq[String]): Seq[Transform] =
-      transforms.map(definition(sft, _))
+      transforms.map(definition(sft, _))   //多个transform转换成序列
 
     /**
      * Create a transform definition from an expression

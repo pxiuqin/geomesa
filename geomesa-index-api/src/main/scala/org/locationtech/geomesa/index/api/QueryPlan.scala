@@ -121,6 +121,7 @@ object QueryPlan {
     def apply(result: T): SimpleFeature
   }
 
+  //结果类型转换成Feature
   object ResultsToFeatures {
 
     /**

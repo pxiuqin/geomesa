@@ -51,7 +51,7 @@ class QueryPlannerTest extends Specification {
 
     "return z3 index for spatio-temporal queries that are bounded by the epoch" in {
       val filter = ECQL.toFilter("BBOX(geom, -1, -1, 1, 1) and dtg > '1970-01-01' and dtg < '2018-01-01'")
-      val query = new Query(sft.getTypeName, filter)
+      val query = new Query(sft.getTypeName, filter)  //把查询转换成使用Z3Index来完成
       foreach(ds.getQueryPlan(query)) { plan =>
         plan.filter.index.name mustEqual Z3Index.name
       }

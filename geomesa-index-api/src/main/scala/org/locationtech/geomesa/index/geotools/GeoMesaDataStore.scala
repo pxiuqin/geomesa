@@ -491,7 +491,7 @@ abstract class GeoMesaDataStore[DS <: GeoMesaDataStore[DS]](val config: GeoMesaD
 
   /**
    * Gets the query plan for a given query. The query plan consists of the tables, ranges, iterators etc
-   * required to run a query against the data store.
+   * required to run a query against the data store.【获取查询计划】
    *
    * @param query query to execute
    * @param index hint on the index to use to satisfy the query

@@ -24,7 +24,7 @@ import org.opengis.filter.Filter
 
 /**
  * Tracks stats for a schema - spatial/temporal bounds, number of records, etc. Persistence of
- * stats is not part of this trait, as different implementations will likely have different method signatures.
+ * stats is not part of this trait, as different implementations will likely have different method signatures.[GeoMesa统计操作]
  */
 trait GeoMesaStats extends Closeable {
 

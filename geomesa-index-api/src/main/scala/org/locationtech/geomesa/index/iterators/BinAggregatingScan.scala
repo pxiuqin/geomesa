@@ -107,7 +107,7 @@ object BinAggregatingScan {
 
   /**
     * Get the attributes used by a BIN query
-    *
+    * 基于BIN查询类型来获取所有属性值
     * @param hints query hints
     * @param sft simple feature type
     * @return

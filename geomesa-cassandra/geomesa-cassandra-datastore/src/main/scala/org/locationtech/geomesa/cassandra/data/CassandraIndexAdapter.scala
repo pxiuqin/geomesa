@@ -153,6 +153,7 @@ object CassandraIndexAdapter extends LazyLogging {
     select
   }
 
+  //Cassandra查询结果转换成Features
   class CassandraResultsToFeatures(_index: GeoMesaFeatureIndex[_, _], _sft: SimpleFeatureType)
       extends IndexResultsToFeatures[Row](_index, _sft) {
 
@@ -185,8 +186,9 @@ object CassandraIndexAdapter extends LazyLogging {
       partition: Option[String]
     ) extends BaseIndexWriter(indices, wrapper) with StrictLogging {
 
+    //构建一个操作映射3元组
     private val mappers = indices.toArray.map { index =>
-      val mapper = CassandraColumnMapper(index)
+      val mapper = CassandraColumnMapper(index)    //构建列映射关系
       val table = index.getTableNames(partition) match {
         case Seq(t) => t // should always be writing to a single table here
         case tables => throw new IllegalStateException(s"Expected a single table but got: ${tables.mkString(", ")}")
@@ -206,10 +208,10 @@ object CassandraIndexAdapter extends LazyLogging {
           case kv: SingleRowKeyValue[_] =>
             val bindings = mapper.bind(kv)
             logger.trace(s"${statement.getQueryString} : ${debug(bindings)}")
-            ds.session.execute(statement.bind(bindings: _*))
+            ds.session.execute(statement.bind(bindings: _*))  //单行写入
 
           case mkv: MultiRowKeyValue[_] =>
-            mkv.split.foreach { kv =>
+            mkv.split.foreach { kv =>   //拆分成单行写入
               val bindings = mapper.bind(kv)
               logger.trace(s"${statement.getQueryString} : ${debug(bindings)}")
               ds.session.execute(statement.bind(bindings: _*))

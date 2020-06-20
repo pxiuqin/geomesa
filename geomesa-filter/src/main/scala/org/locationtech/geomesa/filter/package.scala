@@ -46,7 +46,7 @@ package object filter {
    *
    * Note that this further implies that NOTs have been 'pushed down' and do have not have ANDs nor ORs as children.
    *
-   * In boolean logic, this form is called disjunctive normal form (DNF).
+   * In boolean logic, this form is called disjunctive normal form (DNF).  析取范式
    *
    * @param filter An arbitrary filter.
    * @return       A filter in DNF (described above).
@@ -103,7 +103,7 @@ package object filter {
    *
    * Note that this further implies that NOTs have been 'pushed down' and do have not have ANDs nor ORs as children.
    *
-   * In boolean logic, this form is called conjunctive normal form (CNF).
+   * In boolean logic, this form is called conjunctive normal form (CNF). 合取范式
    *
    * The main use case for this function is to aid in splitting filters between a combination of a
    * GeoMesa data store and some other data store. This is done with the AndSplittingFilter class.
@@ -215,6 +215,9 @@ package object filter {
    *  The input is a filter which had a Not applied to it.
    *  This function uses deMorgan's law to 'push the Not down'
    *   as well as cancel adjacent Nots.
+   *  德·摩根定律
+   * 非(P 且 Q)=(非 P)或(非 Q)
+   * 非(P 或 Q)=(非 P)且(非 Q)
    */
   private[filter] def deMorgan(f: Filter)(implicit ff: FilterFactory): Filter = f match {
     case and: And => ff.or(and.getChildren.map(a => ff.not(a)))

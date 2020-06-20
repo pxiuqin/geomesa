@@ -13,6 +13,7 @@ import java.io.PrintStream
 import com.typesafe.scalalogging.Logger
 import org.slf4j.LoggerFactory
 
+//查询计划详情打印
 trait Explainer {
   private var indent = ""
   def apply(s: => String): Explainer = { output(s"$indent$s"); this }

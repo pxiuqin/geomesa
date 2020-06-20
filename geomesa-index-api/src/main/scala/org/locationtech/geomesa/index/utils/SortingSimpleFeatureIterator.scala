@@ -29,7 +29,7 @@ import scala.util.control.NonFatal
 
 /**
   * In memory sorting of simple features, with optional spill to disk
-  *
+  * 基于内存来完成SF的排序
   * @param features unsorted feature iterator
   * @param sortBy attributes to sort by, in the form: (name, reverse).
   *               for sort by feature id (e.g. natural sort), use an empty string for name
@@ -192,7 +192,7 @@ object SortingSimpleFeatureIterator extends LazyLogging {
 
   /**
    * Does a merge sort on a group of locally sorted files and a left-over in-memory iterator
-   *
+   * 归并排序
    * @param files files to merge
    * @param serializer serializer
    * @param mem left-over in-memory features, already sorted
@@ -208,12 +208,12 @@ object SortingSimpleFeatureIterator extends LazyLogging {
     ) extends CloseableIterator[SimpleFeature] {
 
     // list of feature iterators to merge
-    private val merging = IndexedSeq(CloseableIterator(mem)) ++ files.map(new FileIterator(_, serializer))
+    private val merging = IndexedSeq(CloseableIterator(mem)) ++ files.map(new FileIterator(_, serializer))  //合并多个Iterator
 
     // priority queue containing the next feature from each file
     private val heads = {
-      val o = Ordering.by[(SimpleFeature, Int), SimpleFeature](_._1)(ordering)
-      val q = new java.util.PriorityQueue[(SimpleFeature, Int)](files.size + 1, o)
+      val o = Ordering.by[(SimpleFeature, Int), SimpleFeature](_._1)(ordering)  //排序函数，实现了Comparator
+      val q = new java.util.PriorityQueue[(SimpleFeature, Int)](files.size + 1, o)  //基于优先级队列来实现排序
       var i = 0
       while (i < merging.length) {
         val m = merging(i)

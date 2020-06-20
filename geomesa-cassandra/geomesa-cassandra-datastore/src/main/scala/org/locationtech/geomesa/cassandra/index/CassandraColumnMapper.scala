@@ -55,6 +55,7 @@ trait CassandraColumnMapper {
   def bind(value: SingleRowKeyValue[_]): Seq[AnyRef]
   def bindDelete(value: SingleRowKeyValue[_]): Seq[AnyRef]
 
+  //不同的索引方式会实现不同的检索对象
   def select(range: ScanRange[_], tieredKeyRanges: Seq[ByteRange]): Seq[RowSelect]
 
   def insert(session: Session, table: String): PreparedStatement = {

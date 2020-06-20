@@ -17,7 +17,7 @@ import scala.util.control.NonFatal
 
 /**
   * Provides parallelism for scanning multiple ranges at a given time, for systems that don't
-  * natively support that.
+  * natively support that. 【并行的Scan】
   *
   * Subclasses should generally only expose the `CloseableIterator` interface, and make sure to
   * invoke `start()` before returning to the caller.
@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
   * @param ranges ranges to scan
   * @param threads number of client threads to use for scanning
   * @param buffer max size of the buffer for storing results before they are read by the caller
-  * @param sentinel singleton sentinel value used to indicate the completion of scanning threads
+  * @param sentinel singleton sentinel value used to indicate the completion of scanning threads【哨兵对象】
   * @tparam T range type
   * @tparam R scan result type
   */
@@ -39,8 +39,8 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
   private val inQueue = new ConcurrentLinkedQueue(ranges.asJava)
   private val outQueue = new LinkedBlockingQueue[R](buffer)
 
-  private val pool = new CachedThreadPool(threads)
-  private val latch = new CountDownLatch(threads)
+  private val pool = new CachedThreadPool(threads)  //基于JDK的AbstractExecutorService实现的线程池
+  private val latch = new CountDownLatch(threads)  //锁存器，低阶别、轻量级的锁
   private val terminator = new Terminator()
 
   private var retrieved: R = _
@@ -51,7 +51,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
 
   /**
     * Scan a single range
-    *
+    * 继承后自行实现具体的Scan方法
     * @param range range to scan
     */
   protected def scan(range: T): CloseableIterator[R]
@@ -62,7 +62,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
   protected def start(): CloseableIterator[R] = {
     var i = 0
     while (i < threads) {
-      pool.submit(new SingleThreadScan())
+      pool.submit(new SingleThreadScan())  //提交一个任务
       i += 1
     }
     pool.submit(terminator)
@@ -72,7 +72,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
 
   override def hasNext: Boolean = {
     if (retrieved != null) {
-      true
+      true  //判断任务是否可取
     } else {
       retrieved = outQueue.take
       if (!retrieved.eq(sentinel)) {
@@ -112,7 +112,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
     val start = System.currentTimeMillis()
     while (true) {
       if (pool.isTerminated) {
-        return true
+        return true  //多线程运行的任务是否完成
       } else if (System.currentTimeMillis() - start > timeout) {
         return false
       } else {
@@ -132,7 +132,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
     val start = System.currentTimeMillis()
     while (true) {
       if (outQueue.remainingCapacity() == 0) {
-        return true
+        return true   //结果队列如果剩余容量为空了表示已经Full
       } else if (System.currentTimeMillis() - start > timeout) {
         return false
       } else {
@@ -148,7 +148,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
   private class SingleThreadScan extends Runnable {
     override def run(): Unit = {
       try {
-        var range = inQueue.poll()
+        var range = inQueue.poll()  //出队一个查询
         while (range != null) {
           val result = scan(range)
           try {
@@ -163,7 +163,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
           } finally {
             result.close()
           }
-          range = inQueue.poll()
+          range = inQueue.poll()  //不断出队直到结束
         }
       } catch {
         case NonFatal(e) =>
@@ -172,7 +172,7 @@ abstract class AbstractBatchScan[T, R <: AnyRef](ranges: Seq[T], threads: Int, b
           }
           close()
       } finally {
-        latch.countDown()
+        latch.countDown()  //锁释放
       }
     }
   }

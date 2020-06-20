@@ -74,9 +74,9 @@ abstract class LocalQueryRunner(stats: GeoMesaStats, authProvider: Option[Author
     explain(s"Sort: ${query.getHints.getSortFields.map(QueryHints.sortReadableString).getOrElse("none")}")
     explain.popLevel()
 
-    val filter = Option(query.getFilter).filter(_ != Filter.INCLUDE)
+    val filter = Option(query.getFilter).filter(_ != Filter.INCLUDE)   //获取Query的Filter
     val visible = LocalQueryRunner.visible(authProvider)
-    val iter = features(sft, filter).filter(visible.apply)
+    val iter = features(sft, filter).filter(visible.apply)   //基于Filter来查询出Features
 
     val hook = Some(ArrowDictionaryHook(stats, filter))
     var result = transform(sft, iter, query.getHints.getTransform, query.getHints, hook)
@@ -92,6 +92,7 @@ abstract class LocalQueryRunner(stats: GeoMesaStats, authProvider: Option[Author
       }
     }
 
+    //处理重定向查询
     query.getHints.getProjection.foreach { crs =>
       val r = Reprojection(query.getHints.getReturnSft, crs)
       result = result.map(r.apply)
@@ -199,7 +200,7 @@ object LocalQueryRunner {
         case (None, Some(v))    => features.filter(v.apply)
         case (Some(f), Some(v)) => features.filter(feature => v(feature) && f.evaluate(feature))
       }
-      LocalQueryRunner.transform(sft, filtered, transform, hints, arrow)
+      LocalQueryRunner.transform(sft, filtered, transform, hints, arrow)  //转换成明文Feature
     }
   }
 
@@ -384,7 +385,7 @@ object LocalQueryRunner {
     }
   }
 
-  //desity查询转换
+  //density查询转换
   private def densityTransform(
       features: CloseableIterator[SimpleFeature],
       sft: SimpleFeatureType,
@@ -419,6 +420,7 @@ object LocalQueryRunner {
     CloseableIterator(Iterator(new ScalaSimpleFeature(StatsScan.StatsSft, "stat", Array(encoded, GeometryUtils.zeroPoint))))
   }
 
+  //重定向转换操作
   private def projectionTransform(
       features: CloseableIterator[SimpleFeature],
       sft: SimpleFeatureType,

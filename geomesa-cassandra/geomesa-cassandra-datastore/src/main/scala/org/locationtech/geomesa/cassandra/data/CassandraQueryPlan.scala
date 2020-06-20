@@ -19,6 +19,7 @@ import org.locationtech.geomesa.index.utils.ThreadManagement.Timeout
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.filter.Filter
 
+//定义一个Cassandra的查询计划来实现相应QueryPlan的方法
 sealed trait CassandraQueryPlan extends QueryPlan[CassandraDataStore] {
 
   override type Results = Row
@@ -61,6 +62,7 @@ case class EmptyPlan(filter: FilterStrategy, reducer: Option[FeatureReducer] = N
   override def scan(ds: CassandraDataStore): CloseableIterator[Row] = CloseableIterator.empty
 }
 
+//基于查询语句的执行计划
 case class StatementPlan(
     filter: FilterStrategy,
     tables: Seq[String],

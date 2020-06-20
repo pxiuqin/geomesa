@@ -17,6 +17,7 @@ import org.locationtech.geomesa.cassandra.{ColumnSelect, NamedColumn, RowSelect}
 import org.locationtech.geomesa.index.api._
 import org.locationtech.geomesa.index.index.z3.Z3IndexKey
 
+//Cassandra基于Z3索引的列映射处理
 object Z3ColumnMapper {
 
   private val cache = Caffeine.newBuilder().build(

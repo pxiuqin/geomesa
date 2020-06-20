@@ -19,6 +19,7 @@ import org.locationtech.geomesa.utils.collection.CloseableIterator
 
 import scala.collection.JavaConversions._
 
+//基于Cassandra实现的Metadata
 class CassandraBackedMetadata[T](val session: Session, val catalog: String, val serializer: MetadataSerializer[T])
     extends TableBasedMetadata[T] {
 
@@ -48,6 +49,7 @@ class CassandraBackedMetadata[T](val session: Session, val catalog: String, val 
     }
   }
 
+  //删除表操作
   override protected def delete(typeName: String, keys: Seq[String]): Unit = {
     keys.foreach { key =>
       val query = QueryBuilder.delete().from(catalog).where(QueryBuilder.eq("sft", typeName)).and(QueryBuilder.eq("key", key))
@@ -55,6 +57,7 @@ class CassandraBackedMetadata[T](val session: Session, val catalog: String, val 
     }
   }
 
+  //查询单值操作
   override protected def scanValue(typeName: String, key: String): Option[Array[Byte]] = {
     val query = QueryBuilder.select("value").from(catalog)
     query.where(QueryBuilder.eq("sft", typeName)).and(QueryBuilder.eq("key", key))
@@ -64,6 +67,7 @@ class CassandraBackedMetadata[T](val session: Session, val catalog: String, val 
     }
   }
 
+  //查询多值操作
   override protected def scanValues(typeName: String, prefix: String): CloseableIterator[(String, Array[Byte])] = {
     val select = QueryBuilder.select("key", "value").from(catalog).where(QueryBuilder.eq("sft", typeName))
     val iter = session.execute(select).all().iterator.map { row =>
@@ -76,6 +80,7 @@ class CassandraBackedMetadata[T](val session: Session, val catalog: String, val 
     }
   }
 
+  //查询所有的Key
   override protected def scanKeys(): CloseableIterator[(String, String)] = {
     val select = QueryBuilder.select("sft", "key").from(catalog)
     val values = session.execute(select).all().iterator.map(row => (row.getString("sft"), row.getString("key")))

@@ -20,7 +20,7 @@ import scala.reflect.ClassTag
 
 /**
   * The histogram's state is stored in an indexed array, where the index is the bin number
-  * and the values are the counts.
+  * and the values are the counts.【直方图构建】
   *
   * e.g. a range of 0 to 3 with 3 bins will result in these bins: [0, 1), [1, 2), [2, 3) and the
   * array will contain three entries.

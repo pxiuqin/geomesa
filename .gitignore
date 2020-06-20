@@ -27,3 +27,6 @@ geomesa-*.*.*-*
 .metals/*
 .scalafmt.conf
 .vscode/settings.json
+*/.settings
+*/.classpath
+*/.project

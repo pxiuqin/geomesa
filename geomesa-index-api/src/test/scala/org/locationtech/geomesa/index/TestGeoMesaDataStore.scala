@@ -35,6 +35,7 @@ import org.opengis.filter.Filter
 
 import scala.collection.SortedSet
 
+//为测试构建的DS类
 class TestGeoMesaDataStore(looseBBox: Boolean)
     extends GeoMesaDataStore[TestGeoMesaDataStore](TestConfig(looseBBox)) with LocalLocking {
 
@@ -50,6 +51,7 @@ class TestGeoMesaDataStore(looseBBox: Boolean)
 
 object TestGeoMesaDataStore {
 
+  //为测试构建的Adapter
   class TestIndexAdapter extends IndexAdapter[TestGeoMesaDataStore] {
 
     import ByteArrays.ByteOrdering
@@ -98,7 +100,7 @@ object TestGeoMesaDataStore {
       val transform = strategy.hints.getTransform
       val maxFeatures = strategy.hints.getMaxFeatures
       val sort = strategy.hints.getSortFields
-      val project = strategy.hints.getProjection
+      val project = strategy.hints.getProjection  //获取重定向
 
       TestQueryPlan(strategy.filter, tables, strategy.index.sft, serializer, ranges, ecql, transform, sort, maxFeatures, project)
     }

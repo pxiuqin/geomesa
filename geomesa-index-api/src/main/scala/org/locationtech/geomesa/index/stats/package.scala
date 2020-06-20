@@ -25,6 +25,7 @@ package object stats {
 
   /**
     * Stats implementation that will always return None
+    * 给定一个空的统计方法
     */
   object NoopStats extends GeoMesaStats {
 

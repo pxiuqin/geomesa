@@ -16,7 +16,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 /**
  * Executor service that will grow up to the number of threads specified.
- *
+ * 集成JDK的AbstractExecutorService类实现线程池
  * Assertion: core java executors offer 3 features that we want, but you can only use two of them at once:
  *   1. Add threads as needed but re-use idle threads if available
  *   2. Limit the total number of threads available
@@ -59,6 +59,7 @@ class CachedThreadPool(maxThreads: Int) extends AbstractExecutorService with Laz
 
   override def isShutdown: Boolean = stopped.get
 
+  //任务是否完成
   override def isTerminated: Boolean = stopped.get && available == maxThreads // should be safe to read a volatile primitive
 
   override def awaitTermination(timeout: Long, unit: TimeUnit): Boolean = {

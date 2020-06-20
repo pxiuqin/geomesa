@@ -32,6 +32,7 @@ package object metadata {
 
   object NoOpMetadata extends NoOpMetadata[Any]
 
+  //构建一个无元数据类
   class NoOpMetadata[T] extends GeoMesaMetadata[T] {
     override def getFeatureTypes: Array[String] = Array.empty
     override def insert(typeName: String, key: String, value: T): Unit = {}

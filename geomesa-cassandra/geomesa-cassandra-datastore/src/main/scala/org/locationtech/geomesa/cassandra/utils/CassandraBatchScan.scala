@@ -17,16 +17,18 @@ import org.locationtech.geomesa.index.utils.ThreadManagement.{LowLevelScanner, M
 import org.locationtech.geomesa.utils.collection.CloseableIterator
 import org.opengis.filter.Filter
 
+//继承了AbstractBatchScan的多线程Scan数据
 private class CassandraBatchScan(session: Session, ranges: Seq[Statement], threads: Int, buffer: Int)
     extends AbstractBatchScan[Statement, Row](ranges, threads, buffer, CassandraBatchScan.Sentinel) {
 
   override protected def scan(range: Statement): CloseableIterator[Row] =
-    CloseableIterator(session.execute(range).iterator())
+    CloseableIterator(session.execute(range).iterator())  //基于Cassandra-client的Session来完成查询语句的执行
 }
 
 //基于Cassandra的批量获取
 object CassandraBatchScan {
 
+  //设置一个空Row对象做哨兵
   private val Sentinel: Row = new AbstractGettableData(ProtocolVersion.NEWEST_SUPPORTED) with Row {
     override def getIndexOf(name: String): Int = -1
     override def getColumnDefinitions: ColumnDefinitions = null

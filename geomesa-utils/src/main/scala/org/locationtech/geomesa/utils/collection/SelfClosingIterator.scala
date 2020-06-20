@@ -19,7 +19,7 @@ import org.opengis.feature.simple.SimpleFeature
 
 import scala.collection.Iterator
 
-// By 'self-closing', we mean that the iterator will automatically call close once it is completely exhausted.
+// By 'self-closing', we mean that the iterator will automatically call close once it is completely exhausted.【自动关闭Iterator】
 trait SelfClosingIterator[+A] extends CloseableIterator[A] {
   abstract override def hasNext: Boolean = {
     val res = super.hasNext

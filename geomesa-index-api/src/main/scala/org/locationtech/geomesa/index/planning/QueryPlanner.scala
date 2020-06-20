@@ -53,18 +53,21 @@ class QueryPlanner[DS <: GeoMesaDataStore[DS]](ds: DS) extends QueryRunner with 
     getQueryPlans(sft, query, index, output).toList // toList forces evaluation of entire iterator
   }
 
+  //执行查询计划
   override def runQuery(sft: SimpleFeatureType, query: Query, explain: Explainer): CloseableIterator[SimpleFeature] = {
-    val plans = getQueryPlans(sft, query, None, explain)
+    val plans = getQueryPlans(sft, query, None, explain)  //获取查询计划
 
     var iterator = SelfClosingIterator(plans.iterator).flatMap(p => p.scan(ds).map(p.resultsToFeatures.apply))
 
+    //是否执行Reduce
     if (!query.getHints.isSkipReduce) {
       plans.headOption.flatMap(_.reducer).foreach { reducer =>
         require(plans.tail.forall(_.reducer.contains(reducer)), "Reduce must be the same in all query plans")
-        iterator = reducer.apply(iterator)
+        iterator = reducer.apply(iterator)  //执行Reduce操作
       }
     }
 
+    //排序操作
     plans.headOption.flatMap(_.sort).foreach { sort =>
       require(plans.tail.forall(_.sort.contains(sort)), "Sort must be the same in all query plans")
       iterator = new SortingSimpleFeatureIterator(iterator, sort)
@@ -94,7 +97,7 @@ class QueryPlanner[DS <: GeoMesaDataStore[DS]](ds: DS) extends QueryRunner with 
   }
 
   /**
-    * Set up the query plans and strategies used to execute them
+    * Set up the query plans and strategies used to execute them【把Query中的语句转换成具体的查询计划】
     *
     * @param sft simple feature type
     * @param original query to plan
@@ -128,7 +131,7 @@ class QueryPlanner[DS <: GeoMesaDataStore[DS]](ds: DS) extends QueryRunner with 
       val transform = query.getHints.getTransformSchema
       val evaluation = query.getHints.getCostEvaluation
       val strategies =
-        StrategyDecider.getFilterPlan(ds, sft, query.getFilter, transform, evaluation, requestedIndex, output)
+        StrategyDecider.getFilterPlan(ds, sft, query.getFilter, transform, evaluation, requestedIndex, output)  //基于策略获取过滤语句的查询转换
       output.popLevel()
 
       var strategyCount = 1
@@ -153,6 +156,7 @@ object QueryPlanner extends LazyLogging {
 
   private [planning] val threadedHints = new SoftThreadLocal[Map[AnyRef, AnyRef]]
 
+  //基于Cost的评估，有统计和索引
   object CostEvaluation extends Enumeration {
     type CostEvaluation = Value
     val Stats, Index = Value
@@ -171,14 +175,14 @@ object QueryPlanner extends LazyLogging {
    */
   def setQueryTransforms(sft: SimpleFeatureType, query: Query): Unit = {
     extractQueryTransforms(sft, query).foreach { case (schema, _, transforms) =>
-      query.getHints.put(QueryHints.Internal.TRANSFORMS, transforms)
-      query.getHints.put(QueryHints.Internal.TRANSFORM_SCHEMA, schema)
+      query.getHints.put(QueryHints.Internal.TRANSFORMS, transforms)  //设定Transforms，感觉上面的代码错误了把
+      query.getHints.put(QueryHints.Internal.TRANSFORM_SCHEMA, schema)  //设置了Schema
     }
   }
 
   /**
    * Extract and parse transforms from the query
-   *
+   * 基于一个Query转换成多个Transform
    * @param sft simple feature type
    * @param query query
    * @return
@@ -213,6 +217,7 @@ object QueryPlanner extends LazyLogging {
     // ignore transforms that don't actually do anything
     def noop(props: Seq[String]): Boolean = props == sft.getAttributeDescriptors.asScala.map(_.getLocalName)
 
+    //返回一个查询3元祖
     Option(query.getPropertyNames).map(withSort).filterNot(noop).orElse(fromQueryType).map { props =>
       val transforms = Transforms(sft, props)
       val schema = Transforms.schema(sft, transforms)

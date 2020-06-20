@@ -31,7 +31,7 @@ class FilterSplitter(sft: SimpleFeatureType, indices: Seq[GeoMesaFeatureIndex[_,
   /**
     * Splits the query up into different filter plans to be evaluated. Each filter plan will consist of one or
     * more query plans. Each query plan will have a primary part (that would be used for query planning)
-    * and an optional secondary part (that would be applied as a secondary filter).
+    * and an optional secondary part (that would be applied as a secondary filter).【基于ECQL转换的具体Filter查询计划】
     *
     * Examples:
     *
@@ -59,7 +59,7 @@ class FilterSplitter(sft: SimpleFeatureType, indices: Seq[GeoMesaFeatureIndex[_,
     *
     */
   def getQueryOptions(filter: Filter, transform: Option[SimpleFeatureType] = None): Seq[FilterPlan] = {
-    // cnf gives us a top level AND with ORs as first children
+    // cnf gives us a top level AND with ORs as first children【重写过滤器合取范式】
     rewriteFilterInCNF(filter) match {
       case a: And =>
         // look for ORs across attributes, e.g. bbox OR dtg

@@ -22,7 +22,7 @@ import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter.Filter
 
 /**
-  * Selects from available strategies for answering a query
+  * Selects from available strategies for answering a query【选择不同策略来生成查询】
   */
 trait StrategyDecider {
 
@@ -40,6 +40,7 @@ trait StrategyDecider {
 
 object StrategyDecider extends MethodProfiling with LazyLogging {
 
+  //可以基于配置来获得策略
   private val decider: StrategyDecider = SystemProperty("geomesa.strategy.decider").option match {
     case None       => new CostBasedStrategyDecider()
     case Some(clas) => Class.forName(clas).newInstance().asInstanceOf[StrategyDecider]

@@ -20,6 +20,7 @@ import org.locationtech.geomesa.utils.text.StringSerialization
 import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter.sort.{SortBy, SortOrder}
 
+//给定查询提示
 object QueryHints {
 
   val QUERY_INDEX      = new ClassKey(classOf[String])

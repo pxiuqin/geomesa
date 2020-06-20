@@ -21,7 +21,7 @@ import org.opengis.feature.simple.SimpleFeature
 import scala.annotation.tailrec
 import scala.collection.{GenTraversableOnce, Iterator}
 
-// A CloseableIterator is one which involves some kind of close function which should be called at the end of use.
+// A CloseableIterator is one which involves some kind of close function which should be called at the end of use.【一个提供丰富关闭功能的Iterator】
 object CloseableIterator {
 
   private val empty: CloseableIterator[Nothing] = apply(Iterator.empty)

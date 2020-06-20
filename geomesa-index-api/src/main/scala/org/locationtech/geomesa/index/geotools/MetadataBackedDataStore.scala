@@ -35,7 +35,7 @@ import org.opengis.filter.Filter
 import scala.util.control.NonFatal
 
 /**
-  * Abstract base class for data store implementations using metadata to track schemas
+  * Abstract base class for data store implementations using metadata to track schemas【包含有元数据的DS】
   */
 abstract class MetadataBackedDataStore(config: NamespaceConfig) extends DataStore
     with HasGeoMesaMetadata[String] with DistributedLocking with LazyLogging {

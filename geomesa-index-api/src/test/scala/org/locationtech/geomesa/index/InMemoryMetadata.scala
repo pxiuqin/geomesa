@@ -10,6 +10,7 @@ package org.locationtech.geomesa.index
 
 import org.locationtech.geomesa.index.metadata.GeoMesaMetadata
 
+//基于内存存储的Metadata
 class InMemoryMetadata[T] extends GeoMesaMetadata[T] {
 
   import scala.collection.mutable.{ Map => mMap }
