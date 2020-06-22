@@ -37,15 +37,17 @@ class DefaultSplitter extends TableSplitter with LazyLogging {
   override def getSplits(sft: SimpleFeatureType, index: String, options: String): Array[Array[Byte]] =
     getSplits(sft, index, null, options)
 
+  //基于分区表获取Split数组
   override def getSplits(sft: SimpleFeatureType,
                          index: String,
                          partition: String,
                          options: String): Array[Array[Byte]] = {
+    //获取具体Index的ID
     val splits = Try(IndexId.id(index)).toOption.flatMap { id =>
       val opts = Option(options).map(KVPairParser.parse).getOrElse(Map.empty)
       id.name match {
         case IdIndex.name                 => Some(idBytes(opts))
-        case Z3Index.name | XZ3Index.name => Some(z3Bytes(sft, Option(partition), opts))
+        case Z3Index.name | XZ3Index.name => Some(z3Bytes(sft, Option(partition), opts))  //涉及时间，需要处理基于时间的分区
         case Z2Index.name | XZ2Index.name => Some(z2Bytes(opts))
         case AttributeIndex.name          => Some(attributeBytes(sft, id.attributes.head, opts))
         case AttributeIndex.JoinIndexName => Some(attributeBytes(sft, id.attributes.head, opts))

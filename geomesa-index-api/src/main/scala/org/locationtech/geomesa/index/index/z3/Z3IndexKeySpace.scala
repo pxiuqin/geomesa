@@ -31,6 +31,7 @@ import org.opengis.filter.Filter
 
 import scala.util.control.NonFatal
 
+//Z3索引key空间
 class Z3IndexKeySpace(val sft: SimpleFeatureType,
                       val sharding: ShardStrategy,
                       geomField: String,

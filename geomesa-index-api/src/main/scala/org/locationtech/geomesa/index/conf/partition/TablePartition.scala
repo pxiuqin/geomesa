@@ -62,7 +62,7 @@ object TablePartition extends StrictLogging {
     * @return
     */
   def apply(ds: HasGeoMesaMetadata[String], sft: SimpleFeatureType): Option[TablePartition] = {
-    val name = sft.getUserData.get(Configs.TablePartitioning).asInstanceOf[String]
+    val name = sft.getUserData.get(Configs.TablePartitioning).asInstanceOf[String]  //获取分区表
     if (name == null) { None } else {
       factories.find(_.name.equalsIgnoreCase(name)).map(_.create(ds, sft)).orElse {
         throw new IllegalArgumentException(s"No table partitioning of type '$name' is defined")

@@ -60,6 +60,7 @@ class TimePartition(metadata: GeoMesaMetadata[String], typeName: String, dtg: St
     f"${toBin(ZonedDateTime.ofInstant(toInstant(date), ZoneOffset.UTC))}%05d" // a short should fit into 5 digits
   }
 
+  //找出分区
   override def partitions(filter: Filter): Option[Seq[String]] = {
     val intervals = FilterHelper.extractIntervals(filter, dtg)
     if (intervals.disjoint) {
@@ -75,6 +76,7 @@ class TimePartition(metadata: GeoMesaMetadata[String], typeName: String, dtg: St
     }
   }
 
+  //恢复操作
   override def recover(partition: String): AnyRef =
     new Date(toDate(BinnedTime(partition.toShort, 0L)).toInstant.toEpochMilli)
 
@@ -86,7 +88,7 @@ object TimePartition {
 
   import org.locationtech.geomesa.utils.geotools.RichSimpleFeatureType.RichSimpleFeatureType
 
-  val Name = "time"
+  val Name = "time"  //标识按时间进行分区
 
   private val PartitionKeyPrefix = "partition."
 

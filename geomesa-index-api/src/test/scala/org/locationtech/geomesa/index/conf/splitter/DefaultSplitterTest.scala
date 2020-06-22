@@ -35,14 +35,14 @@ class DefaultSplitterTest extends Specification {
     val attrInt = GeoMesaFeatureIndex.identifier(AttributeIndex.JoinIndexName, AttributeIndex.version, Seq("myInt"))
 
     "produce correct id splits" in {
-      val opts = "id.pattern:[A-Z]"
-      val splits = splitter.getSplits(sft, id, opts)
+      val opts = "id.pattern:[A-Z]"  //split模式
+      val splits = splitter.getSplits(sft, id, opts)  //返回split数组
       splits must haveLength(26)
       splits.map(new String(_, StandardCharsets.UTF_8)).mkString mustEqual "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     }
 
     "produce correct tiered id splits" in {
-      val opts = "id.pattern:[A-B][A-C]"
+      val opts = "id.pattern:[A-B][A-C]"  //表示全排列
       val splits = splitter.getSplits(sft, id, opts)
       splits must haveLength(6)
       splits.map(new String(_, StandardCharsets.UTF_8)).mkString(",") mustEqual "AA,AB,AC,BA,BB,BC"
@@ -53,7 +53,7 @@ class DefaultSplitterTest extends Specification {
       val splits = splitter.getSplits(sft, id, opts)
       splits.length must be equalTo 20
       splits.map(new String(_, StandardCharsets.UTF_8)).toSeq mustEqual
-          (0 to 9).map(_.toString) ++ (0 to 9).map(i => s"8$i")
+          (0 to 9).map(_.toString) ++ (0 to 9).map(i => s"8$i")  //两个pattern合集
     }
 
     "produce correct z3 splits" in {

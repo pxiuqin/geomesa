@@ -50,10 +50,19 @@ class GeoMesaDataStoreTest extends Specification {
   val ds = new TestGeoMesaDataStore(true)
   ds.createSchema(sft)
 
+  //生产测试的Features
   val features = Seq.tabulate(10) { i =>
     ScalaSimpleFeature.create(sft, s"$i", s"name$i", i, f"2018-01-01T$i%02d:00:00.000Z", s"POINT (4$i 55)")
   }
 
+  /**
+    * 伪墨卡托投影，也被称为球体墨卡托，Web Mercator。它是基于墨卡托投影的，把 WGS84坐标系投影到正方形。我们前面已经知道 WGS84 是基于椭球体的，但是伪墨卡托投影把坐标投影到球体上，这导致两极的失真变大，但是却更容易计算。
+    * 这也许是为什么被称为”伪“墨卡托吧。另外，伪墨卡托投影还切掉了南北85.051129°纬度以上的地区，以保证整个投影是正方形的。因为墨卡托投影等正形性的特点，在不同层级的图层上物体的形状保持不变，一个正方形可以不断被划分为更多更小的正方形以显示更清晰的细节。
+    * 很明显，伪墨卡托坐标系是非常显示数据，但是不适合存储数据的，通常我们使用WGS84 存储数据，使用伪墨卡托显示数据。
+    *
+    * Web Mercator 最早是由 Google 提出的，当前已经成为 Web Map 的事实标准。但是也许是由于上面”伪“的原因，最初 Web Mercator 被拒绝分配EPSG 代码。
+    * 于是大家普遍使用 EPSG:900913（Google的数字变形） 的非官方代码来代表它。直到2008年，才被分配了EPSG:3785的代码，但在同一年没多久，又被弃用，重新分配了 EPSG:3857 的正式代码，使用至今。
+    */
   val epsg3857 = CRS.decode("EPSG:3857")
 
   step {
@@ -64,11 +73,11 @@ class GeoMesaDataStoreTest extends Specification {
   "GeoMesaDataStore" should {
     "reproject geometries" in {
       val query = new Query("test")
-      query.setCoordinateSystemReproject(epsg3857)
+      query.setCoordinateSystemReproject(epsg3857) //设置坐标系统
       val results = SelfClosingIterator(ds.getFeatureReader(query, Transaction.AUTO_COMMIT)).toSeq
       results must haveLength(10)
 
-      val transform = CRS.findMathTransform(epsg3857, CRS_EPSG_4326, true)
+      val transform = CRS.findMathTransform(epsg3857, CRS_EPSG_4326, true)  //容忍一部分损失来转换坐标系，3587->4326
 
       foreach(results) { result =>
         result.getFeatureType.getGeometryDescriptor.getCoordinateReferenceSystem mustEqual epsg3857
@@ -157,7 +166,7 @@ class GeoMesaDataStoreTest extends Specification {
           val reader = ds.getFeatureReader(new Query(sft.getTypeName, filter), Transaction.AUTO_COMMIT)
           SelfClosingIterator(reader).toList mustEqual Seq(ScalaSimpleFeature.copy(sft, feature))
         }
-        ds.stats.getCount(sft) must beSome(1L)
+        ds.stats.getCount(sft) must beSome(1L)  //统计数量
         ds.stats.getMinMax[String](sft, "name", exact = false).map(_.max) must beSome("name0")
 
         // rename column

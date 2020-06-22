@@ -16,6 +16,7 @@ import org.locationtech.geomesa.index.strategies.SpatioTemporalFilterStrategy
 import org.locationtech.geomesa.utils.index.IndexMode.IndexMode
 import org.opengis.feature.simple.SimpleFeatureType
 
+//Z3索引，包括时间+空间
 class Z3Index protected (
     ds: GeoMesaDataStore[_],
     sft: SimpleFeatureType,

@@ -44,6 +44,7 @@ object ShardStrategy {
   private val instances = new ConcurrentHashMap[Int, ShardStrategyImpl]()
 
   def apply(count: Int): ShardStrategy = {
+    //判断是否有分片操作
     if (count < 2) { NoShardStrategy } else {
       var strategy = instances.get(count)
       if (strategy == null) {
@@ -68,8 +69,10 @@ object ShardStrategy {
     def apply(sft: SimpleFeatureType): ShardStrategy = ShardStrategy(sft.getAttributeShards)
   }
 
+  //实现分配策略
   class ShardStrategyImpl(override val shards: IndexedSeq[Array[Byte]]) extends ShardStrategy {
     override def apply(feature: WritableFeature): Array[Byte] = {
+      //基于featureID的hash来完成分片
       try { shards(feature.idHash % shards.length) } catch {
         // handle case where hash is Int.MinValue, which isn't handled by math.abs
         case e: IndexOutOfBoundsException => shards.head

@@ -17,7 +17,7 @@ import scala.collection.GenTraversableOnce
   *
   * @param values values extracted from the filter. If nothing was extracted, will be empty
   * @param precise values exactly match the filter, or may return false positives
-  * @param disjoint mutually exclusive values were extracted, e.g. 'a < 1 && a > 2'
+  * @param disjoint mutually exclusive values were extracted, e.g. 'a < 1 && a > 2'  //标明是否相交
   * @tparam T type parameter
   */
 case class FilterValues[+T](values: Seq[T], precise: Boolean = true, disjoint: Boolean = false) {
@@ -39,10 +39,10 @@ object FilterValues {
 
   def or[T](join: (Seq[T], Seq[T]) => Seq[T])(left: FilterValues[T], right: FilterValues[T]): FilterValues[T] = {
     (left.disjoint, right.disjoint) match {
-      case (false, false) => FilterValues(join(left.values, right.values), left.precise && right.precise)
+      case (false, false) => FilterValues(join(left.values, right.values), left.precise && right.precise) //表示相交
       case (false, true)  => left
       case (true,  false) => right
-      case (true,  true)  => FilterValues.disjoint
+      case (true,  true)  => FilterValues.disjoint  //表示不相交
     }
   }
 
@@ -50,7 +50,7 @@ object FilterValues {
     if (left.disjoint || right.disjoint) {
       FilterValues.disjoint
     } else {
-      val intersections = left.values.flatMap(v => right.values.flatMap(intersect(_, v)))
+      val intersections = left.values.flatMap(v => right.values.flatMap(intersect(_, v)))  //相交操作
       if (intersections.isEmpty) {
         FilterValues.disjoint
       } else {

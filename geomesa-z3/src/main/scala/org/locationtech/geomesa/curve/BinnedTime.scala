@@ -279,6 +279,7 @@ object BinnedTime {
     Epoch.plusYears(date.bin).plus(date.offset, ChronoUnit.MINUTES)
 }
 
+//标识时间周期
 object TimePeriod extends Enumeration {
 
   type TimePeriod = Value

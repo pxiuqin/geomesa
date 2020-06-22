@@ -31,7 +31,7 @@ class IdIndex protected (ds: GeoMesaDataStore[_], sft: SimpleFeatureType, versio
 object IdIndex extends ConfiguredIndex {
 
   override val name = "id"
-  override val version = 4
+  override val version = 4  //版本是用来区分geomesa的索引版本区分，数据库中会存储
 
   override def supports(sft: SimpleFeatureType, attributes: Seq[String]): Boolean =
     IdIndexKeySpace.supports(sft, attributes)

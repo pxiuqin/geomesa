@@ -71,8 +71,10 @@ object NormalizedDimension {
       if (x >= maxIndex) { min + (maxIndex + 0.5d) * denormalizer } else { min + (x + 0.5d) * denormalizer }
   }
 
+  //基于精度来正则化处理纬度
   case class NormalizedLat(precision: Int) extends BitNormalizedDimension(-90d, 90d, precision)
 
+  //基于精度来正则化处理经度
   case class NormalizedLon(precision: Int) extends BitNormalizedDimension(-180d, 180d, precision)
 
   case class NormalizedTime(precision: Int, override val max: Double) extends BitNormalizedDimension(0d, max, precision)

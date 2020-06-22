@@ -232,7 +232,7 @@ object RichSimpleFeatureType {
 
     def getZ3Interval: TimePeriod = userData[String](IndexZ3Interval) match {
       case None    => TimePeriod.Week
-      case Some(i) => TimePeriod.withName(i.toLowerCase)
+      case Some(i) => TimePeriod.withName(i.toLowerCase)  //获取枚举的名称
     }
     def setZ3Interval(i: TimePeriod): Unit = sft.getUserData.put(IndexZ3Interval, i.toString)
 

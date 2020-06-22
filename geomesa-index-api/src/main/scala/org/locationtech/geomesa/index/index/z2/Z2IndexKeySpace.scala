@@ -54,7 +54,7 @@ class Z2IndexKeySpace(val sft: SimpleFeatureType, val sharding: ShardStrategy, g
     val z = try { sfc.index(geom.getX, geom.getY, lenient) } catch {
       case NonFatal(e) => throw new IllegalArgumentException(s"Invalid z value from geometry: $geom", e)
     }
-    val shard = sharding(writable)
+    val shard = sharding(writable)   //分片策略
 
     // create the byte array - allocate a single array up front to contain everything
     // ignore tier, not used here
@@ -72,15 +72,17 @@ class Z2IndexKeySpace(val sft: SimpleFeatureType, val sharding: ShardStrategy, g
     SingleRowKeyValue(bytes, sharing, shard, z, tier, id, writable.values)
   }
 
+  //基于filter获取索引值
   override def getIndexValues(filter: Filter, explain: Explainer): Z2IndexValues = {
 
     val geometries: FilterValues[Geometry] = {
       val extracted = FilterHelper.extractGeometries(filter, geomField, intersect = true) // intersect since we have points
-      if (extracted.nonEmpty) { extracted } else { FilterValues(Seq(WholeWorldPolygon)) }
+      if (extracted.nonEmpty) { extracted } else { FilterValues(Seq(WholeWorldPolygon)) }  //如果没有过滤器，返回完整的空间
     }
 
     explain(s"Geometries: $geometries")
 
+    //判断是否相交
     if (geometries.disjoint) {
       explain("Non-intersecting geometries extracted, short-circuiting to empty query")
       return Z2IndexValues(sfc, geometries, Seq.empty)

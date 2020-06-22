@@ -56,9 +56,10 @@ class AttributeIndexTest extends Specification with LazyLogging {
     Array("bob",     30,   12f, bobDate,     bobGeom),
     Array("charles", null, 12f, charlesDate, charlesGeom)
   ).map { entry =>
-    ScalaSimpleFeature.create(sft, entry.head.toString, entry: _*)
+    ScalaSimpleFeature.create(sft, entry.head.toString, entry: _*)  //传入feature值
   }
 
+  //重叠判断
   def overlaps(r1: TestRange, r2: TestRange): Boolean = {
     ByteArrays.ByteOrdering.compare(r1.start, r2.start) match {
       case 0 => true
@@ -72,7 +73,7 @@ class AttributeIndexTest extends Specification with LazyLogging {
       forall(Seq(0, 32, 127, 128, 129, 255, 256, 257)) { i =>
         val bytes = AttributeIndexKey.indexToBytes(i)
         bytes must haveLength(2)
-        val recovered = ByteArrays.readShort(bytes)
+        val recovered = ByteArrays.readShort(bytes)  //反转换
         recovered mustEqual i
       }
     }
@@ -132,7 +133,7 @@ class AttributeIndexTest extends Specification with LazyLogging {
       val ds = new TestGeoMesaDataStore(true)
       ds.createSchema(sft)
 
-      ds.manager.indices(sft) must haveLength(1)
+      ds.manager.indices(sft) must haveLength(1)  //通过index-manager来获取sft中索引
       ds.manager.indices(sft).flatMap(_.attributes) mustEqual Seq("name")
 
       WithClose(ds.getFeatureWriterAppend(typeName, Transaction.AUTO_COMMIT)) { writer =>

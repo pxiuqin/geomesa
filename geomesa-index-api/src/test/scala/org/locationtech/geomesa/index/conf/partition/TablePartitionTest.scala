@@ -31,7 +31,7 @@ class TablePartitionTest extends Specification {
   val ds = new TestGeoMesaDataStore(false)
 
   val sft = SimpleFeatureTypes.createType("table-partition-test", s"dtg:Date,*geom:Point:srid=4326;" +
-      s"${Configs.TablePartitioning}=${TimePartition.Name}")
+      s"${Configs.TablePartitioning}=${TimePartition.Name}")  //设置了按照时间分区配置
 
   val timeToBin = BinnedTime.timeToBin(sft.getZ3Interval)
 
@@ -54,7 +54,7 @@ class TablePartitionTest extends Specification {
     "recover an attribute from a partition" in {
       val partitionOption = TablePartition(ds, sft)
       partitionOption must beSome
-      val partition = partitionOption.get
+      val partition = partitionOption.get  //获取相关分区
       val date = Converters.convert("2018-01-01T00:00:00.000Z", classOf[Date])
       val recovered = partition.recover(partition.partition(sf(date)))
       recovered must beAnInstanceOf[Date]

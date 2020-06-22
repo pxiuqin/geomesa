@@ -402,7 +402,7 @@ object GeoMesaFeatureIndex {
     * @return
     */
   def identifier(name: String, version: Int, attributes: Seq[String]): String =
-    s"$name:$version:${attributes.mkString(":")}"
+    s"$name:$version:${attributes.mkString(":")}"  //构建一个识别码
 
   /**
     * Identifier string for an index. Can be parsed with `IndexId.parse`

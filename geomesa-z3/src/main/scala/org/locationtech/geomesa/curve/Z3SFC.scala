@@ -23,12 +23,13 @@ class Z3SFC(period: TimePeriod, precision: Int = 21) extends SpaceTimeFillingCur
 
   require(precision > 0 && precision < 22, "Precision (bits) per dimension must be in [1,21]")
 
-  val lon: NormalizedDimension  = NormalizedLon(precision)
+  val lon: NormalizedDimension  = NormalizedLon(precision)  //给定精度正则化处理经度
   val lat: NormalizedDimension  = NormalizedLat(precision)
   val time: NormalizedDimension = NormalizedTime(precision, BinnedTime.maxOffset(period).toDouble)
 
   val wholePeriod = Seq((time.min.toLong, time.max.toLong))
 
+  //Z3填充曲线转换
   override def index(x: Double, y: Double, t: Long, lenient: Boolean = false): Long = {
     try {
       require(x >= lon.min && x <= lon.max && y >= lat.min && y <= lat.max && t >= time.min && t <= time.max,
@@ -46,6 +47,7 @@ class Z3SFC(period: TimePeriod, precision: Int = 21) extends SpaceTimeFillingCur
     Z3(lon.normalize(bx), lat.normalize(by), time.normalize(bt)).z
   }
 
+  //反编码出相关经纬度和时间
   override def invert(z: Long): (Double, Double, Long) = {
     val (x, y, t) = Z3(z).decode
     (lon.denormalize(x), lat.denormalize(y), time.denormalize(t).toLong)
@@ -69,6 +71,7 @@ object Z3SFC {
   private val SfcMonth = new Z3SFC(TimePeriod.Month)
   private val SfcYear  = new Z3SFC(TimePeriod.Year)
 
+  //给定不同的时间周期来构建Z3SFC
   def apply(period: TimePeriod): Z3SFC = period match {
     case TimePeriod.Day   => SfcDay
     case TimePeriod.Week  => SfcWeek

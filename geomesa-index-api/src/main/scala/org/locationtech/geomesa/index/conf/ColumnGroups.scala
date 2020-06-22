@@ -35,7 +35,7 @@ class ColumnGroups {
 
   /**
     * Gets the column groups for a simple feature type. The default group will contain all columns
-    *
+    * 基于sft来构建包含全列的group
     * @param sft simple feature type
     * @return
     */
@@ -78,6 +78,7 @@ class ColumnGroups {
     * @return
     */
   def serializers(sft: SimpleFeatureType): Seq[(Array[Byte], SimpleFeatureSerializer)] = {
+    //基于sft转换层带colFamily
     apply(sft).map { case (colFamily, subset) =>
       if (colFamily.eq(ColumnGroups.Default) || colFamily.eq(ColumnGroups.Attributes)) {
         (colFamily, KryoFeatureSerializer(subset, SerializationOptions.withoutId))

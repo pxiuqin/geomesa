@@ -31,7 +31,7 @@ class Z3FilterTest extends Specification {
     "dtg DURING 2014-01-01T00:00:00.000Z/2014-01-08T12:00:00.000Z"
   ).map(ECQL.toFilter)
 
-  val values = filters.map(keySpace.getIndexValues(_, ExplainNull))
+  val values = filters.map(keySpace.getIndexValues(_, ExplainNull))  //构建了IndexValues
 
   def compare(actual: Z3Filter, expected: Z3Filter): MatchResult[Boolean] = {
     val left = Array[AnyRef](actual.xy, actual.t, Short.box(actual.minEpoch), Short.box(actual.maxEpoch))

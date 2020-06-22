@@ -16,6 +16,7 @@ import org.locationtech.geomesa.index.index.z2.Z2IndexValues
 import org.locationtech.geomesa.utils.index.ByteArrays
 import org.locationtech.sfcurve.zorder.Z2
 
+//给定空间范围进行过滤操作
 class Z2Filter(val xy: Array[Array[Int]]) extends RowFilter {
 
   override def inBounds(buf: Array[Byte], offset: Int): Boolean = {
@@ -42,12 +43,12 @@ object Z2Filter extends RowFilterFactory[Z2Filter] {
   private val TermSeparator  = ";"
 
   def apply(values: Z2IndexValues): Z2Filter = {
-    val sfc = values.sfc
+    val sfc = values.sfc   //填充曲线值
     val xy: Array[Array[Int]] = values.bounds.map { case (xmin, ymin, xmax, ymax) =>
       Array(sfc.lon.normalize(xmin), sfc.lat.normalize(ymin), sfc.lon.normalize(xmax), sfc.lat.normalize(ymax))
     }.toArray
 
-    new Z2Filter(xy)
+    new Z2Filter(xy)  //转换成基于填充曲线编码后的bound
   }
 
   override def serializeToBytes(filter: Z2Filter): Array[Byte] = {

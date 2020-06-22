@@ -12,10 +12,11 @@ import org.locationtech.geomesa.curve.NormalizedDimension.{NormalizedLat, Normal
 import org.locationtech.sfcurve.IndexRange
 import org.locationtech.sfcurve.zorder.{Z2, ZRange}
 
+//Z2空间填充曲线
 object Z2SFC extends Z2SFC(31)
 
 /**
-  * z2 space-filling curve
+  * z2 space-filling curve 【z2空间填充曲线】
   *
   * @param precision number of bits used per dimension - note sum must be less than 64
   */
@@ -24,6 +25,7 @@ class Z2SFC(precision: Int) extends SpaceFillingCurve {
   val lon: NormalizedDimension = NormalizedLon(precision)
   val lat: NormalizedDimension = NormalizedLat(precision)
 
+  //把经纬度使用Z2填充曲线转换
   override def index(x: Double, y: Double, lenient: Boolean = false): Long = {
     try {
       require(x >= lon.min && x <= lon.max && y >= lat.min && y <= lat.max,
@@ -34,17 +36,20 @@ class Z2SFC(precision: Int) extends SpaceFillingCurve {
     }
   }
 
+  //约束到给定的区间范围内
   protected def lenientIndex(x: Double, y: Double): Long = {
     val bx = if (x < lon.min) { lon.min } else if (x > lon.max) { lon.max } else { x }
     val by = if (y < lat.min) { lat.min } else if (y > lat.max) { lat.max } else { y }
     Z2(lon.normalize(bx), lat.normalize(by)).z
   }
 
+  //Z2填充曲线反转会经纬度
   override def invert(z: Long): (Double, Double) = {
     val (x, y) = Z2(z).decode
     (lon.denormalize(x), lat.denormalize(y))
   }
 
+  //给定区间范围索引
   override def ranges(xy: Seq[(Double, Double, Double, Double)],
                       precision: Int,
                       maxRanges: Option[Int]): Seq[IndexRange] = {
