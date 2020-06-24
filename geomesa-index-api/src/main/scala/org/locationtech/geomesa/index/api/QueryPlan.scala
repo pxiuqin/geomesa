@@ -205,7 +205,7 @@ object QueryPlan {
   /**
     * Client-side reduce for the results of a scan. Must have a zero-arg constructor to allow re-creation from
     * a serialized form.
-    *
+    * 基于Feature的Reducer操作
     * Reducers are encouraged to also allow direct instantiation via an alternate constructor, as
     * serialization is generally only used for map/reduce jobs. Similarly, state is encouraged to be
     * lazily evaluated.

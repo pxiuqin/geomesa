@@ -13,9 +13,10 @@ import org.locationtech.geomesa.fs.storage.api.{NamedOptions, PartitionScheme, P
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import org.opengis.filter.Filter
 
+//构建水平分区
 object FlatScheme extends PartitionScheme {
 
-  override val depth: Int = 0
+  override val depth: Int = 0  //不设定深度
 
   override def getPartitionName(feature: SimpleFeature): String = ""
 

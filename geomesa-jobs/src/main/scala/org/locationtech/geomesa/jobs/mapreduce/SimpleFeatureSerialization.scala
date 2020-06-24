@@ -52,7 +52,7 @@ object SimpleFeatureSerialization {
   /**
     * Serializer class that delegates to kryo serialization. Simple feature type must be configured
     * in the job, and is identified by a unique hash code
-    *
+    * Feature序列成HDFS文件
     * @param types configured feature types
     */
   class HadoopSimpleFeatureSerializer(types: Seq[(String, Int, SimpleFeatureType)])
@@ -83,7 +83,7 @@ object SimpleFeatureSerialization {
   /**
     * Deserializer class that delegates to kryo serialization. Simple feature type must be is configured
     * in the job, and is identified by a unique hash code
-    *
+    * 从HDFS文件反序列化成Feature
     * @param types configured feature types
     */
   class HadoopSimpleFeatureDeserializer(types: Seq[(String, Int, SimpleFeatureType)])

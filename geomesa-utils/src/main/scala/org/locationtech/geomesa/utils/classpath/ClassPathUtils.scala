@@ -15,6 +15,7 @@ import com.typesafe.scalalogging.LazyLogging
 
 import scala.collection.mutable.ArrayBuffer
 
+//加载jar包通用类
 object ClassPathUtils extends LazyLogging {
 
   private val jarFileFilter = new FilenameFilter() {

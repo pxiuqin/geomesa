@@ -81,7 +81,7 @@ class FileSystemDataStoreTest extends Specification {
         WithClose(ds.getFeatureWriterAppend(format, Transaction.AUTO_COMMIT)) { writer =>
           features.foreach(FeatureUtils.write(writer, _, useProvidedFid = true))
         }
-
+        print(dir.getPath)
         // metadata
         new File(dir, s"$format/metadata").exists() must beTrue
         new File(dir, s"$format/metadata").isDirectory must beTrue

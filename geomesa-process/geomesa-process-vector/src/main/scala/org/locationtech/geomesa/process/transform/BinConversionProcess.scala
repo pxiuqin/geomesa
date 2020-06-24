@@ -27,7 +27,7 @@ import org.opengis.feature.Feature
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 @DescribeProcess(
-  title = "Binary Conversion",
+  title = "Binary Conversion",  //二进制转换
   description = "Converts a feature collection to binary format"
 )
 class BinConversionProcess extends GeoMesaProcess with LazyLogging {
@@ -77,7 +77,7 @@ class BinConversionProcess extends GeoMesaProcess with LazyLogging {
       i
     }
 
-    val geomField  = Option(geom).map(indexOf)
+    val geomField  = Option(geom).map(indexOf)  //获取geom的下标
     val dtgField   = Option(dtg).map(indexOf).orElse(sft.getDtgIndex)
     val trackField = Option(track).filter(_ != "id").map(indexOf)
     val labelField = Option(label).map(indexOf)

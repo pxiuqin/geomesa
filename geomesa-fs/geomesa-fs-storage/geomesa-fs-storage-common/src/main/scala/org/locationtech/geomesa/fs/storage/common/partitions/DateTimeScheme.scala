@@ -23,6 +23,7 @@ import org.opengis.filter.Filter
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 
+//基于时间构建分区
 case class DateTimeScheme(format: String, stepUnit: ChronoUnit, step: Int, dtg: String, dtgIndex: Int)
     extends PartitionScheme {
 
@@ -49,7 +50,7 @@ case class DateTimeScheme(format: String, stepUnit: ChronoUnit, step: Int, dtg: 
 
   // TODO This may not be the best way to calculate max depth...
   // especially if we are going to use other separators
-  override val depth: Int = format.count(_ == '/')
+  override val depth: Int = format.count(_ == '/')  //基于深度构建分层目录
 
   override def getPartitionName(feature: SimpleFeature): String =
     fmt.format(toInstant(feature.getAttribute(dtgIndex).asInstanceOf[Date]).atZone(ZoneOffset.UTC))

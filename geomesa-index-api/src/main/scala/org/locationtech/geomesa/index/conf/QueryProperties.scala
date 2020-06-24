@@ -12,6 +12,7 @@ import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties
 import org.locationtech.geomesa.utils.conf.GeoMesaSystemProperties.SystemProperty
 import org.opengis.filter.Filter
 
+//查询属性构建
 object QueryProperties {
 
   val QueryExactCount: SystemProperty = SystemProperty("geomesa.force.count", "false")

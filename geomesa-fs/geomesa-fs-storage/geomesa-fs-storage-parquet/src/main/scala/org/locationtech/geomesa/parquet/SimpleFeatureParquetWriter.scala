@@ -19,6 +19,7 @@ import org.apache.parquet.hadoop.{ParquetFileWriter, ParquetWriter}
 import org.locationtech.geomesa.parquet.io.SimpleFeatureWriteSupport
 import org.opengis.feature.simple.SimpleFeature
 
+//Feature写入Parquet中
 object SimpleFeatureParquetWriter extends LazyLogging {
 
   def builder(file: Path, conf: Configuration): Builder = {
@@ -37,6 +38,7 @@ object SimpleFeatureParquetWriter extends LazyLogging {
       .withRowGroupSize(8*1024*1024)
   }
 
+  //继承ParquetWriter来构建写入对象
   class Builder private [SimpleFeatureParquetWriter] (file: Path)
       extends ParquetWriter.Builder[SimpleFeature, Builder](file) {
     override def self(): Builder = this

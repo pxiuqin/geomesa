@@ -101,8 +101,8 @@ object KNearestNeighborSearchProcess {
       }
     }
 
-    private lazy val results = Seq.fill(queries.length)(Array.ofDim[FeatureWithDistance](k))
-    private lazy val calculators = queries.zip(results).map { case (p, r) => new KnnCalculator(p, k, threshold, r) }
+    private lazy val results = Seq.fill(queries.length)(Array.ofDim[FeatureWithDistance](k))  //给定结果序列的k个数组
+    private lazy val calculators = queries.zip(results).map { case (p, r) => new KnnCalculator(p, k, threshold, r) }  //分别计算每个feature的knn
 
     private var result: FeatureResult = _
 
@@ -338,7 +338,7 @@ object KNearestNeighborSearchProcess {
     def visit(feature: SimpleFeature): Option[Double] = {
       feature.getDefaultGeometry match {
         case p: Point =>
-          val meters = calculator.meters(query, p)
+          val meters = calculator.meters(query, p)  //给定点的位置
           if (meters > threshold) {
             Some(meters)
           } else {

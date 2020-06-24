@@ -68,6 +68,7 @@ object ParquetFileSystemStorage {
 
   val ParquetCompressionOpt = "parquet.compression"
 
+  //Parquet格式文件的写入
   class ParquetFileSystemWriter(
       sft: SimpleFeatureType,
       file: Path,

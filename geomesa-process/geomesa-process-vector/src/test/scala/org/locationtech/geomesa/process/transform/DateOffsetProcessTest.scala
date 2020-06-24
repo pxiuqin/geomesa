@@ -36,7 +36,7 @@ class DateOffsetProcessTest extends Specification {
   "DateOffSet Process" should {
     "move a feature collection back in time one day" in {
       val collection = new ListFeatureCollection(sft, new Random(-1L).shuffle(features))
-      val result = process.execute(collection, "dtg", "P-1D")
+      val result = process.execute(collection, "dtg", "P-1D")  //相当于减一天
       val dates = SelfClosingIterator(result.features()).map(_.getAttribute("dtg")).toList
       val expected = (0 until 10).map(i => Converters.convert(s"2017-02-19T00:00:0$i.000Z", classOf[Date]))
       dates must containTheSameElementsAs(expected)
@@ -44,7 +44,7 @@ class DateOffsetProcessTest extends Specification {
 
     "move a feature collection forward in time one day" in {
       val collection = new ListFeatureCollection(sft, new Random(-1L).shuffle(features))
-      val result = process.execute(collection, "dtg", "P1D")
+      val result = process.execute(collection, "dtg", "P1D")  //相当于加一天
       val dates = SelfClosingIterator(result.features()).map(_.getAttribute("dtg")).toList
       val expected = (0 until 10).map(i => Converters.convert(s"2017-02-21T00:00:0$i.000Z", classOf[Date]))
       dates must containTheSameElementsAs(expected)
@@ -52,7 +52,7 @@ class DateOffsetProcessTest extends Specification {
 
     "move a feature collection back in time one hour" in {
       val collection = new ListFeatureCollection(sft, new Random(-1L).shuffle(features))
-      val result = process.execute(collection, "dtg", "PT-1H")
+      val result = process.execute(collection, "dtg", "PT-1H")  //相当于减一个小时
       val dates = SelfClosingIterator(result.features()).map(_.getAttribute("dtg")).toList
       val expected = (0 until 10).map(i => Converters.convert(s"2017-02-19T23:00:0$i.000Z", classOf[Date]))
       dates must containTheSameElementsAs(expected)
@@ -60,7 +60,7 @@ class DateOffsetProcessTest extends Specification {
 
     "move a feature collection forward with mixed units" in {
       val collection = new ListFeatureCollection(sft, new Random(-1L).shuffle(features))
-      val result = process.execute(collection, "dtg", "P5DT1H")
+      val result = process.execute(collection, "dtg", "P5DT1H")  //加5天1小时
       val dates = SelfClosingIterator(result.features()).map(_.getAttribute("dtg")).toList
       val expected = (0 until 10).map(i => Converters.convert(s"2017-02-25T01:00:0$i.000Z", classOf[Date]))
       dates must containTheSameElementsAs(expected)

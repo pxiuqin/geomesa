@@ -28,6 +28,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.collection.immutable.NumericRange
 
+//构建TubeFeature【包括geom，startTime，endTime】
 object TubeBuilder {
   val DefaultDtgField = "dtg"
 }
@@ -40,7 +41,7 @@ abstract class TubeBuilder(val tubeFeatures: SimpleFeatureCollection,
                            val bufferDistance: Double,
                            val maxBins: Int) extends LazyLogging {
 
-  val calc = new GeodeticCalculator()
+  val calc = new GeodeticCalculator()  //测地计算
   val dtgField: String = tubeFeatures.getSchema.getDtgField.getOrElse(TubeBuilder.DefaultDtgField)
   val geoFac = new GeometryFactory
 
@@ -49,23 +50,25 @@ abstract class TubeBuilder(val tubeFeatures: SimpleFeatureCollection,
   val tubeType: SimpleFeatureType = SimpleFeatureTypes.createType("tubeType", s"$GEOM_PROP:Geometry:srid=4326,start:Date,end:Date")
   val builder: SimpleFeatureBuilder = ScalaSimpleFeatureFactory.featureBuilder(tubeType)
 
-  def getGeom(sf: SimpleFeature): Geometry = sf.getAttribute(0).asInstanceOf[Geometry]
+  def getGeom(sf: SimpleFeature): Geometry = sf.getAttribute(0).asInstanceOf[Geometry]  //从第一个属性获取
   def getStartTime(sf: SimpleFeature): Date = sf.getAttribute(1).asInstanceOf[Date]
   def getEndTime(sf: SimpleFeature): Date = sf.getAttribute(2).asInstanceOf[Date]
 
   def bufferGeom(geom: Geometry, meters: Double): Geometry = {
     import org.locationtech.geomesa.utils.geotools.Conversions.RichGeometry
-    geom.buffer(metersToDegrees(meters, geom.safeCentroid()))
+    geom.buffer(metersToDegrees(meters, geom.safeCentroid())) //把质心作为极坐标计算的起始点
   }
 
+  //极坐标下给定长度和起始点转换成弧度
   def metersToDegrees(meters: Double, point: Point): Double = {
     logger.debug("Buffering: "+meters.toString + " "+WKTUtils.write(point))
 
-    calc.setStartingGeographicPoint(point.getX, point.getY)
-    calc.setDirection(0, meters)
+    calc.setStartingGeographicPoint(point.getX, point.getY)  //确定起始点
+    //方位角是从某点的指北方向线起依顺时针方向至目标方向线间的水平夹角，用“度”和“密位”表示。常用于判定方位、指示目标和保持行进方向
+    calc.setDirection(0, meters)  //确定方向，地平经度（方位角）
     val dest2D = calc.getDestinationGeographicPoint
     val destPoint = geoFac.createPoint(new Coordinate(dest2D.getX, dest2D.getY))
-    point.distance(destPoint)
+    point.distance(destPoint)   //弧度距离？
   }
 
   def buffer(simpleFeatures: Iterator[SimpleFeature], meters:Double): Iterator[SimpleFeature] =
@@ -106,7 +109,7 @@ abstract class TubeBuilder(val tubeFeatures: SimpleFeatureCollection,
     //If the points cross the IDL we must generate two line segments
     if (GeometryUtils.crossesIDL(input1, input2)) {
       //Find the latitude where the segment intercepts the IDL
-      val latIntercept = GeometryUtils.calcIDLIntercept(input1, input2)
+      val latIntercept = GeometryUtils.calcIDLIntercept(input1, input2)  //计算交集
       val p1 = new Coordinate(-180, latIntercept)
       val p2 = new Coordinate(180, latIntercept)
       //This orders the points so that point1 is always the east-most point

@@ -233,7 +233,7 @@ package object api {
    *
    * @param index feature index to scan
    * @param primary primary filter used for range generation
-   * @param secondary secondary filter not captured in the ranges
+   * @param secondary secondary filter not captured in the ranges【配合primary完成一个区间的筛选】
    * @param temporal does the filter strategy have a temporal component
    * @param toCost estimated cost of executing the query against this index
    */

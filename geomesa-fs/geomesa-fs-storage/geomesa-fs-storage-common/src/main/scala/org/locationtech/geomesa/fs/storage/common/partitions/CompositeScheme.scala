@@ -15,6 +15,7 @@ import org.opengis.filter.Filter
 
 import scala.util.control.NonFatal
 
+//组合模式下构建分区
 case class CompositeScheme(schemes: Seq[PartitionScheme]) extends PartitionScheme {
 
   require(schemes.lengthCompare(1) > 0, "Must provide at least 2 schemes for a composite scheme")
@@ -31,7 +32,7 @@ case class CompositeScheme(schemes: Seq[PartitionScheme]) extends PartitionSchem
     // get the partial path for our current partition scheme
     def slice: Option[String] = splits.map { splits =>
       val from = schemes.take(i).map(_.depth).sum
-      splits.slice(from, from + schemes(i).depth).mkString("/")
+      splits.slice(from, from + schemes(i).depth).mkString("/")  //构建分区目录
     }
 
     schemes.head.getSimplifiedFilters(filter, slice).map { head =>

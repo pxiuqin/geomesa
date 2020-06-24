@@ -34,6 +34,7 @@ import org.opengis.filter.Filter
 
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
+//读写DFS文件
 class FileSystemRDDProvider extends SpatialRDDProvider with LazyLogging {
 
   override def canProcess(params: java.util.Map[String, _ <: Serializable]): Boolean =
@@ -51,7 +52,7 @@ class FileSystemRDDProvider extends SpatialRDDProvider with LazyLogging {
       def runQuery(filter: Filter, paths: Seq[StorageFilePath], modifications: Boolean): RDD[SimpleFeature] = {
         // note: file input format requires a job object, but conf gets copied in job object creation,
         // so we have to copy the file paths back out
-        val job = Job.getInstance(conf)
+        val job = Job.getInstance(conf)  //Hadoop M/R
 
         // note: we have to copy all the conf twice?
         FileInputFormat.setInputPaths(job, paths.map(_.path): _*)
@@ -71,7 +72,7 @@ class FileSystemRDDProvider extends SpatialRDDProvider with LazyLogging {
 
         if (modifications) {
           StorageConfiguration.setPathActions(conf, paths)
-          val rdd = sc.newAPIHadoopRDD(conf, action, classOf[SimpleFeatureAction], classOf[SimpleFeature])
+          val rdd = sc.newAPIHadoopRDD(conf, action, classOf[SimpleFeatureAction], classOf[SimpleFeature]) //基于Hadoop的RDD
           // group updates by feature ID, then take the most recent
           rdd.groupBy(_._1.id).flatMap { case (_, group) =>
             val (action, sf) = group.minBy(_._1)

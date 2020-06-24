@@ -18,6 +18,7 @@ import org.locationtech.sfcurve.IndexRange
 import org.opengis.feature.simple.SimpleFeatureType
 import org.opengis.filter.Filter
 
+//基于空间构建分区
 abstract class SpatialScheme(bits: Int, geom: String) extends PartitionScheme {
 
   require(bits % 2 == 0, "Resolution must be an even number")

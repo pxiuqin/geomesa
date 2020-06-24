@@ -69,11 +69,11 @@ trait GeoMesaDataStoreServlet extends PersistentDataStoreServlet {
    */
   post("/ds/:alias") {
     val dsParams = datastoreParams
-    val ds = Try(DataStoreFinder.getDataStore(dsParams)).getOrElse(null)
+    val ds = Try(DataStoreFinder.getDataStore(dsParams)).getOrElse(null)  //基于参数构建DS
     if (ds == null) {
       BadRequest(body = "Could not load data store using the provided parameters.")
     } else {
-      dataStoreCache.put(dsParams.toSeq.sorted.mkString(","), ds)
+      dataStoreCache.put(dsParams.toSeq.sorted.mkString(","), ds)  //对ds进行缓存
       val alias = params("alias")
       val prefix = keyFor(alias)
       val toPersist = dsParams.map { case (k, v) =>

@@ -24,7 +24,7 @@ object JobUtils extends LazyLogging {
    * @param libJars jar prefixes to load
    */
   def setLibJars(conf: Configuration, libJars: Seq[String], searchPath: Iterator[() => Seq[File]]): Unit = {
-    val extra = ClassPathUtils.loadClassPathFromEnv("GEOMESA_EXTRA_CLASSPATHS")
+    val extra = ClassPathUtils.loadClassPathFromEnv("GEOMESA_EXTRA_CLASSPATHS")   //从环境变量加载jar包
     val found = ClassPathUtils.findJars(libJars, searchPath)
     // always prepend GEOMESA_EXTRA_CLASSPATHS first
     val paths = (extra ++ found).map(f => "file://" + f.getAbsolutePath)

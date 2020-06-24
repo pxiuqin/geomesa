@@ -8,6 +8,7 @@
 
 package org.locationtech.geomesa.utils.stats
 
+//标识索引不重复出现的基数
 object Cardinality  extends Enumeration {
   type Cardinality = Value
   val HIGH    = Value("high")

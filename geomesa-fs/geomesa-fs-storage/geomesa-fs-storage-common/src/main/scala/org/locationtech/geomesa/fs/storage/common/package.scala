@@ -54,6 +54,7 @@ package object common {
     }
   }
 
+  //配置参数
   object StorageKeys {
     val EncodingKey    = "geomesa.fs.encoding"
     val LeafStorageKey = "geomesa.fs.leaf-storage"
@@ -82,7 +83,7 @@ package object common {
       sft.getUserData.put(SchemeKey, serialize(NamedOptions(name, options)))
     // noinspection ScalaDeprecation
     def removeScheme(): Option[NamedOptions] =
-      remove(SchemeKey).map(deserialize).orElse(remove("geomesa.fs.partition-scheme.config").map(deserialize))
+      remove(SchemeKey).map(deserialize).orElse(remove("geomesa.fs.partition-scheme.config").map(deserialize))  //用户需要配置"geomesa.fs.scheme"
 
     def setMetadata(name: String, options: Map[String, String] = Map.empty): Unit =
       sft.getUserData.put(MetadataKey, serialize(NamedOptions(name, options)))

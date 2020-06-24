@@ -31,7 +31,7 @@ import org.opengis.filter.Filter
 import scala.collection.JavaConversions._
 
 @DescribeProcess(
-  title = "Tube Select",
+  title = "Tube Select",  //基于一个给定的Feature集合来进行Tube选择操作， Tube【geom，startTime，endTime】
   description = "Performs a tube select on a Geomesa feature collection based on another feature collection"
 )
 class TubeSelectProcess extends GeoMesaProcess with LazyLogging {
@@ -153,10 +153,10 @@ class TubeVisitor(val tubeFeatures: SimpleFeatureCollection,
     val tube = tubeBuilder.createTube
 
     val queryResults = CloseableIterator(tube).flatMap { sf =>
-      val sfMin = tubeBuilder.getStartTime(sf).getTime
+      val sfMin = tubeBuilder.getStartTime(sf).getTime  //获取开始时间
       val minDate = new Date(sfMin - maxTime*1000)
 
-      val sfMax = tubeBuilder.getEndTime(sf).getTime
+      val sfMax = tubeBuilder.getEndTime(sf).getTime  //获取结束时间
       val maxDate = new Date(sfMax + maxTime*1000)
 
       val dtg1 = ff.greater(dateProperty, ff.literal(minDate))

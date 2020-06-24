@@ -10,6 +10,7 @@ package org.locationtech.geomesa.web.core
 
 import org.locationtech.geomesa.utils.cache.PropertiesPersistence
 
+//持久化DS
 trait PersistentDataStoreServlet extends GeoMesaScalatraServlet {
 
   def persistence: PropertiesPersistence

@@ -314,7 +314,7 @@ class AttributeIndexTest extends Specification with LazyLogging {
       val ds = new TestGeoMesaDataStore(true)
       ds.createSchema(sft)
 
-      ds.getSchema(typeName).getDescriptor("name").getCardinality mustEqual Cardinality.HIGH
+      ds.getSchema(typeName).getDescriptor("name").getCardinality mustEqual Cardinality.HIGH  //给定索引不重复率的基数值
 
       val notNull = FastFilterFactory.toFilter(sft, "name IS NOT NULL")
       val notNullPlans = ds.getQueryPlan(new Query(typeName, notNull))

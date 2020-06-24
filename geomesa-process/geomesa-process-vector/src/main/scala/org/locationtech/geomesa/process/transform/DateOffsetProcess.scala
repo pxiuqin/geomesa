@@ -23,7 +23,7 @@ import org.locationtech.geomesa.utils.date.DateUtils.toInstant
 import scala.collection.JavaConversions._
 
 @DescribeProcess(
-  title = "Date Offset Process",
+  title = "Date Offset Process", //基于时间偏移的处理
   description = "Modifies the specified date field in a feature collection by an input time period."
 )
 class DateOffsetProcess extends GeoMesaProcess {
@@ -34,7 +34,8 @@ class DateOffsetProcess extends GeoMesaProcess {
               obsFeatures: SimpleFeatureCollection,
               @DescribeParameter(name = "dateField", description = "The date attribute to modify")
               dateField: String,
-              @DescribeParameter(name = "timeOffset", description = "Time offset (e.g. P1D)")
+              //关于P1D：https://github.com/cylc/cylc-flow/wiki/ISO-8601
+              @DescribeParameter(name = "timeOffset", description = "Time offset (e.g. P1D)")  //每天重复从6:00开始
               timeOffset: String): SimpleFeatureCollection = {
 
     val period = try { Duration.parse(timeOffset) } catch {
@@ -44,10 +45,10 @@ class DateOffsetProcess extends GeoMesaProcess {
     require(dtgIndex != -1, s"Field '$dateField' does not exist in input feature collection: ${obsFeatures.getSchema}")
 
     val iter = SelfClosingIterator(obsFeatures.features()).map { sf =>
-      val dtg = sf.getAttribute(dateField).asInstanceOf[Date]
-      val offset = ZonedDateTime.ofInstant(toInstant(dtg), ZoneOffset.UTC).plus(period)
+      val dtg = sf.getAttribute(dateField).asInstanceOf[Date]  //获取DTG
+      val offset = ZonedDateTime.ofInstant(toInstant(dtg), ZoneOffset.UTC).plus(period)  //计算偏移
       val newDtg = Date.from(offset.toInstant)
-      sf.setAttribute(dtgIndex, newDtg)
+      sf.setAttribute(dtgIndex, newDtg)  //把之前的属性替换掉偏移后的值
       sf
     }
 

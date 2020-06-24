@@ -49,6 +49,7 @@ class FileSystemDataStore(
     names
   }
 
+  //创建schema
   override def createSchema(sft: SimpleFeatureType): Unit = {
     import org.locationtech.geomesa.fs.storage.common.RichSimpleFeatureType
 
@@ -61,6 +62,8 @@ class FileSystemDataStore(
 
         // remove the configs in the user data as they're persisted separately
         val meta = sft.removeMetadata().getOrElse(FileBasedMetadata.DefaultOptions)
+
+        //使用FS-DS必须配置"geomesa.fs.scheme"
         val scheme = sft.removeScheme().getOrElse {
           throw new IllegalArgumentException("Partition scheme must be specified in the SimpleFeatureType user data")
         }

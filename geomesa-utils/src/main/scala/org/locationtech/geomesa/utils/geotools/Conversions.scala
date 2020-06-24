@@ -41,7 +41,7 @@ object Conversions {
     def bufferMeters(meters: Double): Geometry = geom.buffer(distanceDegrees(meters))
     def distanceDegrees(meters: Double): Double = GeometryUtils.distanceDegrees(geom, meters)._2
     def safeCentroid(): Point = {
-      val centroid = geom.getCentroid
+      val centroid = geom.getCentroid  //获取球体质心
       if (java.lang.Double.isNaN(centroid.getCoordinate.x) || java.lang.Double.isNaN(centroid.getCoordinate.y)) {
         geom.getEnvelope.getCentroid
       } else {
