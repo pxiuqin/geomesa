@@ -88,7 +88,7 @@ class LocalConverterIngest(
     val batches = new ConcurrentHashMap[FeatureWriter[SimpleFeatureType, SimpleFeature], AtomicInteger](threads)
 
     try {
-      // keep track of failure at a global level, keep line counts and success local
+      // keep track of failure at a global level, keep line counts and success local【统计测量】
       val globalFailures = new com.codahale.metrics.Counter {
         override def inc(): Unit = failed.incrementAndGet()
         override def inc(n: Long): Unit = failed.addAndGet(n)

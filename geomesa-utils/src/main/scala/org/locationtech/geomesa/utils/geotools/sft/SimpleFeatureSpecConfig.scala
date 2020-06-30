@@ -17,14 +17,31 @@ import org.opengis.feature.simple.SimpleFeatureType
 
 /**
   * SimpleFeatureSpec parsing from/to typesafe config
+  * 举例说明一个SF配置
+    geomesa = {
+      sfts = {
+        example = {
+          type-name = "example"
+          attributes = [
+            { name = "name", type = "String", index = true }
+            { name = "age", type = "Integer" }
+            { name = "dtg", type = "Date", default = true }
+            { name = "geom", type = "Point", default = true, srid = 4326 }
+          ]
+          user-data = {
+            option.one = "value"
+          }
+        }
+      }
+    }
   */
 object SimpleFeatureSpecConfig {
 
   import scala.collection.JavaConverters._
 
-  val TypeNamePath   = "type-name"
-  val AttributesPath = "attributes"
-  val UserDataPath   = "user-data"
+  val TypeNamePath   = "type-name"  //SFT名称
+  val AttributesPath = "attributes"  //属性
+  val UserDataPath   = "user-data"  //UserData
 
   val TypePath       = "type"
   val NamePath       = "name"
@@ -44,8 +61,8 @@ object SimpleFeatureSpecConfig {
 
     val toParse = path match {
       case Some(p) => conf.getConfigOpt(p).map(conf.withFallback).getOrElse(conf)
-      case None    => conf
-    }
+    case None    => conf
+  }
     parse(toParse)
   }
 
@@ -116,11 +133,12 @@ object SimpleFeatureSpecConfig {
     toConfig(sft, includeUserData, includePrefix).root().render(opts)
   }
 
+  //转换配置文件
   private def parse(conf: Config): (Option[String], SimpleFeatureSpec) = {
     import org.locationtech.geomesa.utils.conf.ConfConversions.RichConfig
 
     val name = conf.getStringOpt(TypeNamePath)
-    val attributes = conf.getConfigListOpt("fields").getOrElse(conf.getConfigList(AttributesPath)).asScala.map(buildField)
+    val attributes = conf.getConfigListOpt("fields").getOrElse(conf.getConfigList(AttributesPath)).asScala.map(buildField) //转换convert部分
     val opts = {
       val userDataConfig = conf.getConfigOpt(UserDataPath).getOrElse(ConfigFactory.empty)
       val base = userDataConfig.toStringMap()

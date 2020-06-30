@@ -25,7 +25,7 @@ object SimpleFeatureTypeLoader {
 
   import scala.collection.JavaConverters._
 
-  private lazy val providers = ServiceLoader.load[SimpleFeatureTypeProvider]()
+  private lazy val providers = ServiceLoader.load[SimpleFeatureTypeProvider]() //SFT解析提供程序
 
   // keep as a method so we can dynamically reload
   def sfts: List[SimpleFeatureType] = providers.flatMap(_.loadTypes().asScala)
@@ -39,7 +39,7 @@ object SimpleFeatureTypeLoader {
     */
   class ClassPathSftProvider extends SimpleFeatureTypeProvider with ConfigSftParsing {
     override def loadTypes(): java.util.List[SimpleFeatureType] = {
-      val sfts = parseConf(ConfigFactory.load())
+      val sfts = parseConf(ConfigFactory.load())  //转换类型
       logger.debug(s"Loading SFTs from classpath ${sfts.map(_.getTypeName).mkString(", ")}")
       sfts.asJava
     }
@@ -64,7 +64,7 @@ object SimpleFeatureTypeLoader {
         }
       }
       configs.reduceLeftOption(_.withFallback(_)) match {
-        case Some(c) => parseConf(c).asJava
+        case Some(c) => parseConf(c).asJava  //基于配置文件转换SFT
         case None => Collections.emptyList[SimpleFeatureType]()
       }
     }

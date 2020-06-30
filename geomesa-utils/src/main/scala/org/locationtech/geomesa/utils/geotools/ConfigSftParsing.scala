@@ -18,7 +18,7 @@ trait ConfigSftParsing extends LazyLogging {
   import scala.collection.JavaConverters._
 
   /**
-    * Parse out simple feature types from a config
+    * Parse out simple feature types from a config【基于配置文件解析SFT】
     *
     * @param config config
     * @return
@@ -29,7 +29,7 @@ trait ConfigSftParsing extends LazyLogging {
       confs.root.keySet.asScala.toSeq.flatMap { name =>
         val sftConf = confs.getConfig(name)
         try {
-          Some(SimpleFeatureTypes.createType(sftConf, Some(name)))
+          Some(SimpleFeatureTypes.createType(sftConf, Some(name))) //创建SFT
         } catch {
           case e: Exception =>
             logger.error("Error loading simple feature type from config " +

@@ -30,6 +30,7 @@ object SimpleFeatureTypes {
 
   import scala.collection.JavaConverters._
 
+  //配置参数
   object Configs {
 
     // note: configs that don't start with 'geomesa' won't be persisted
@@ -169,7 +170,7 @@ object SimpleFeatureTypes {
     createImmutableType(if (namespace == null) { name } else { s"$namespace:$name" }, spec)
 
   /**
-    * Parse a SimpleFeatureType spec from a typesafe Config
+    * Parse a SimpleFeatureType spec from a typesafe Config【基于配置文件构建SFT】
     *
     * @param conf config
     * @param typeName optional typename to use for the sft. will be overridden if the config contains a type-name key
@@ -179,7 +180,7 @@ object SimpleFeatureTypes {
   def createType(conf: Config,
                  typeName: Option[String] = None,
                  path: Option[String] = Some("sft")): SimpleFeatureType = {
-    val (nameFromConf, spec) = SimpleFeatureSpecConfig.parse(conf, path)
+    val (nameFromConf, spec) = SimpleFeatureSpecConfig.parse(conf, path)  //conf转换
     val (namespace, name) = parseTypeName(nameFromConf.orElse(typeName).getOrElse {
       throw new IllegalArgumentException("Unable to parse type name from provided argument or config")
     })

@@ -21,7 +21,7 @@ import scala.collection.JavaConverters._
 
 object ConverterConfigLoader extends LazyLogging {
 
-  val ConfigPathProperty = SystemProperty("org.locationtech.geomesa.converter.config.path", "geomesa.converters")
+  val ConfigPathProperty = SystemProperty("org.locationtech.geomesa.converter.config.path", "geomesa.converters") //給定转换配置标识
 
   private val configProviders = {
     val pList = ServiceLoader.load(classOf[ConverterConfigProvider]).toList

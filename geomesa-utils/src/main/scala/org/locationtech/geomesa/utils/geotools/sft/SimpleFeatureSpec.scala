@@ -20,7 +20,7 @@ import org.opengis.feature.simple.SimpleFeatureType
 
 /**
   * Intermediate format for simple feature types. Used for converting between string specs,
-  * typesafe config specs and `SimpleFeatureType`s
+  * typesafe config specs and `SimpleFeatureType`s 【基于Spec转换成SFT】
   *
   * @param attributes attributes
   * @param options simple feature level optinos

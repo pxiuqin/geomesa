@@ -60,12 +60,12 @@ trait SimpleFeatureConverter extends Closeable with LazyLogging {
 
 object SimpleFeatureConverter extends StrictLogging {
 
-  val factories: List[SimpleFeatureConverterFactory] = ServiceLoader.load[SimpleFeatureConverterFactory]()
+  val factories: List[SimpleFeatureConverterFactory] = ServiceLoader.load[SimpleFeatureConverterFactory]()  //加载特定SF-Converter
 
   logger.debug(s"Found ${factories.size} factories: ${factories.map(_.getClass.getName).mkString(", ")}")
 
   /**
-    * Create a converter
+    * Create a converter【基于配置构建SF-Converter】
     *
     * @param sft simple feature type
     * @param config converter configuration
