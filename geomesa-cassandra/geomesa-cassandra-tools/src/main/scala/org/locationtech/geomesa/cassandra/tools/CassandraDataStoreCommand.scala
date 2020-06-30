@@ -11,6 +11,7 @@ package org.locationtech.geomesa.cassandra.tools
 import org.locationtech.geomesa.cassandra.data.{CassandraDataStore, CassandraDataStoreFactory}
 import org.locationtech.geomesa.tools.{CatalogParam, DataStoreCommand}
 
+//Cassandra数据存储命令参数
 trait CassandraDataStoreCommand extends DataStoreCommand[CassandraDataStore] {
 
   override def params: CassandraConnectionParams with CatalogParam

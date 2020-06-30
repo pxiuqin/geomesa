@@ -46,11 +46,13 @@ trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] with Distribut
 
   override def libjarsFiles: Seq[String] = Seq("org/locationtech/geomesa/tools/ingest-libjars.list")
 
+  //执行
   override def execute(): Unit = {
     if (params.files.isEmpty && !StdInHandle.isAvailable) {
-      throw new ParameterException("Missing option: <files>... is required")
+      throw new ParameterException("Missing option: <files>... is required")  //要导入的文件
     }
 
+    //
     val inputs = if (params.srcList) {
       val lists = if (params.files.isEmpty) { StdInHandle.available().toList } else {
         params.files.asScala.flatMap(PathUtils.interpretPath).toList
@@ -107,6 +109,7 @@ trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] with Distribut
     }
   }
 
+  //创建导入程序
   protected def createIngest(mode: RunMode, sft: SimpleFeatureType, converter: Config, inputs: Seq[String]): Runnable = {
     mode match {
       case RunModes.Local =>
@@ -126,6 +129,7 @@ trait IngestCommand[DS <: DataStore] extends DataStoreCommand[DS] with Distribut
   }
 }
 
+//导入命令参数
 object IngestCommand extends LazyLogging {
 
   val LocalBatchSize = SystemProperty("geomesa.ingest.local.batch.size", "20000")
@@ -134,11 +138,12 @@ object IngestCommand extends LazyLogging {
   trait IngestParams extends OptionalTypeNameParam with OptionalFeatureSpecParam with OptionalForceParam
       with ConverterConfigParam with OptionalInputFormatParam with DistributedRunParam with DistributedCombineParam {
 
+    //指定导入的线程数
     @Parameter(names = Array("-t", "--threads"), description = "Number of threads if using local ingest")
-    var threads: Integer = 1
+    var threads: Integer = 1  //给定默认值1
 
     @Parameter(names = Array("--src-list"), description = "Input files are text files with lists of files, one per line, to ingest.")
-    var srcList: Boolean = false
+    var srcList: Boolean = false  //是否列出导入文件
 
     @Parameter(names = Array("--no-tracking"), description = "Return immediately after submitting ingest job (distributed jobs)")
     var noWaitForCompletion: Boolean = false
@@ -202,6 +207,8 @@ object IngestCommand extends LazyLogging {
           throw new ParameterException("Parameter <files> did not evaluate to anything that could be read")
         }
       }
+
+      //转换sft和converter
       val (inferredSft, inferredConverter) = try {
         val opt = format match {
           case None      => SimpleFeatureConverter.infer(open, Option(sft), Option(file.path))
@@ -296,6 +303,8 @@ object IngestCommand extends LazyLogging {
     } yield {
       sft
     }
+
+    //加载变量获取SFT
     lazy val fromEnv = Option(params.spec).map(CLArgResolver.getSft(_, params.featureName)).orElse {
       Option(params.featureName).flatMap(name => Try(CLArgResolver.getSft(name)).toOption)
     }
@@ -314,23 +323,25 @@ object IngestCommand extends LazyLogging {
     fromStore.orElse(fromEnv)
   }
 
+  //写入配置文件
   private def writeInferredConverter(typeName: String, converterString: String, schemaString: Option[String]): Unit = {
     import scala.collection.JavaConverters._
 
     try {
+      //加载默认配置中的reference.conf，其中包含了大量的其他数据导入配置
       val conf = this.getClass.getClassLoader.getResources("reference.conf").asScala.find { u =>
-        "file".equalsIgnoreCase(u.getProtocol) && u.getPath.endsWith("/conf/reference.conf")
+        "file".equalsIgnoreCase(u.getProtocol) && u.getPath.endsWith("/conf/reference.conf")  //默认配置中加载其他具体配置
       }
       conf match {
         case None => Command.user.error("Could not persist converter: could not find 'conf/reference.conf'")
         case Some(r) =>
-          val reference = new File(r.toURI)
+          val reference = new File(r.toURI)  //加载配置文件
           val folder = reference.getParentFile
           val baseName = typeName.replaceAll("[^A-Za-z0-9_]+", "_")
           var convert = new File(folder, s"$baseName.conf")
           var i = 1
           while (convert.exists()) {
-            convert = new File(folder, s"${baseName}_$i.conf")
+            convert = new File(folder, s"${baseName}_$i.conf")  //可以加载另外转换文件
             i += 1
           }
           WithClose(new PrintWriter(new FileWriter(convert))) { writer =>

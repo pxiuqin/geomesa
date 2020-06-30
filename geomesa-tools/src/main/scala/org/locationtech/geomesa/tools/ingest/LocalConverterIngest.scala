@@ -55,6 +55,7 @@ class LocalConverterIngest(
     */
   protected def features(iter: CloseableIterator[SimpleFeature]): CloseableIterator[SimpleFeature] = iter
 
+  //运行导入程序
   override protected def runIngest(ds: DataStore, sft: SimpleFeatureType, callback: StatusCallback): Unit = {
     Command.user.info("Running ingestion in local mode")
 

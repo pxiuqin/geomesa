@@ -152,6 +152,7 @@ object CassandraDataStoreFactory extends GeoMesaDataStoreInfo {
 
     override protected def looseBBoxDefault = false
 
+    //转换连接地址
     val ContactPointParam =
       new GeoMesaParam[String](
         "cassandra.contact.point",

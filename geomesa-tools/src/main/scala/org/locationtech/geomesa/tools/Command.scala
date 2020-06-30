@@ -19,7 +19,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConversions._
 
 /**
- * Abstract superclass for all top-level GeoMesa JCommander commands
+ * Abstract superclass for all top-level GeoMesa JCommander commands【Java-commend】
  */
 trait Command {
   val name: String
@@ -34,6 +34,7 @@ object Command {
   val output: Logger = LoggerFactory.getLogger("org.locationtech.geomesa.tools.output")
 }
 
+//构建一个子命令
 trait CommandWithSubCommands extends Command {
 
   def jc: JCommander
@@ -64,6 +65,7 @@ trait DataStoreCommand[DS <: DataStore] extends Command {
 
   @throws[ParameterException]
   def loadDataStore(): DS = {
+    //基于参数来生成DS
     Option(DataStoreFinder.getDataStore(connection).asInstanceOf[DS]).getOrElse {
       throw new ParameterException("Unable to create data store, please check your connection parameters")
     }

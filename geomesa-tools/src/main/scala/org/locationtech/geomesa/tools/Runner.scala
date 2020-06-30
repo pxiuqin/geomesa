@@ -44,7 +44,7 @@ trait Runner extends LazyLogging {
     jc.setProgramName(name)
     jc.addConverterFactory(new GeoMesaIStringConverterFactory)
 
-    val commands = createCommands(jc)
+    val commands = createCommands(jc)  //创建命令，不同DS命令不同
     commands.foreach {
       case command: CommandWithSubCommands =>
         jc.addCommand(command.name, command.params)
@@ -143,6 +143,7 @@ trait Runner extends LazyLogging {
     FileUtils.writeStringToFile(file, out.toString())
   }
 
+  //各个DS的导出程序重写这个方法
   protected def createCommands(jc: JCommander): Seq[Command]
   protected def resolveEnvironment(command: Command): Unit = {}
 

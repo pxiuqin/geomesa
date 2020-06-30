@@ -136,7 +136,7 @@ trait OptionalZookeepersParam {
 
 trait InputFilesParam {
   @Parameter(description = "<file>...")
-  var files: java.util.List[String] = new util.ArrayList[String]()
+  var files: java.util.List[String] = new util.ArrayList[String]()  //加载文件，命令最后的文件
 }
 
 trait OptionalInputFormatParam extends InputFilesParam {
@@ -160,7 +160,7 @@ object IndexParam {
                                             index: String,
                                             mode: IndexMode): GeoMesaFeatureIndex[_, _] = {
     val sft = ds.getSchema(typeName)
-    val indices = ds.manager.indices(sft, mode)
+    val indices = ds.manager.indices(sft, mode)   //加载索引
 
     lazy val available = {
       val names = scala.collection.mutable.Map.empty[String, Int].withDefaultValue(0)
@@ -230,8 +230,8 @@ trait DistributedRunParam {
 
   lazy val mode: Option[RunMode] = {
     Option(runMode).map {
-      case m if m.equalsIgnoreCase(RunModes.Local.toString) => RunModes.Local
-      case m if m.equalsIgnoreCase(RunModes.Distributed.toString) => RunModes.Distributed
+      case m if m.equalsIgnoreCase(RunModes.Local.toString) => RunModes.Local  //本地
+      case m if m.equalsIgnoreCase(RunModes.Distributed.toString) => RunModes.Distributed  //分布式
       case m if m.equalsIgnoreCase("distributedcombine") =>
         DistributedRunParam.this match {
           case p: DistributedCombineParam =>
@@ -253,7 +253,7 @@ trait DistributedRunParam {
 object DistributedRunParam {
   object RunModes extends Enumeration {
     type RunMode = Value
-    val Distributed, Local = Value
+    val Distributed, Local = Value  //分布式和本地不同导入方式
   }
 }
 

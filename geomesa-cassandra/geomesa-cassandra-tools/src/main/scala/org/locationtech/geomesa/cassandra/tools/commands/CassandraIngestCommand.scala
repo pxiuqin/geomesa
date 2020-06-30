@@ -19,6 +19,7 @@ import org.locationtech.geomesa.utils.io.PathUtils
 
 import scala.collection.JavaConversions._
 
+//Cassandra导入命令
 class CassandraIngestCommand extends IngestCommand[CassandraDataStore] with CassandraDataStoreCommand {
 
   override val params = new CassandraIngestParams

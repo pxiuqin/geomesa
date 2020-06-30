@@ -20,6 +20,7 @@ object Prompt {
     def readPassword(): Array[Char]
   }
 
+  //退出进程命令
   lazy val SystemConsole: SystemConsole = {
     val console = System.console()
     if (console == null) {

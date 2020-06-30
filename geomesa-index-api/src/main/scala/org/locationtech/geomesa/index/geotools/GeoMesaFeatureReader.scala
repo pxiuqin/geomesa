@@ -9,7 +9,7 @@
 package org.locationtech.geomesa.index.geotools
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
-
+import org.geotools.filter.text.commons.FilterToTextUtil
 import org.geotools.data.Query
 import org.geotools.data.simple.SimpleFeatureReader
 import org.locationtech.geomesa.filter.filterToString

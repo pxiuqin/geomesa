@@ -46,6 +46,7 @@ import org.opengis.filter.sort.SortOrder
 import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
+//导出命令
 trait ExportCommand[DS <: DataStore] extends DataStoreCommand[DS]
     with DistributedCommand with InteractiveCommand with MethodProfiling {
 
@@ -93,7 +94,7 @@ trait ExportCommand[DS <: DataStore] extends DataStoreCommand[DS]
       throw new ParameterException(s"Schema '${params.featureName}' does not exist in the store")
     }
 
-    val query = ExportCommand.createQuery(sft, params)
+    val query = ExportCommand.createQuery(sft, params)  //生成查询脚本
 
     mode match {
       case RunModes.Local =>
@@ -371,6 +372,7 @@ object ExportCommand extends LazyLogging {
     // noinspection ComparingUnrelatedTypes
     private lazy val fids = !Option(hints.get(QueryHints.ARROW_INCLUDE_FID)).contains(java.lang.Boolean.FALSE)
 
+    //导出不同的格式
     private val exporter = options.format match {
       case ExportFormat.Arrow   => new ArrowExporter(stream, counter, hints, dictionaries)
       case ExportFormat.Avro    => new AvroExporter(stream, counter, options.gzip)

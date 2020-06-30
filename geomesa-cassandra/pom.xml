@@ -11,6 +11,12 @@
     <name>GeoMesa Cassandra</name>
     <packaging>pom</packaging>
 
+    <properties>
+        <!--跳过单元测试 -->
+        <maven.test.skip>true</maven.test.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
+
     <modules>
         <module>geomesa-cassandra-datastore</module>
         <module>geomesa-cassandra-dist</module>
