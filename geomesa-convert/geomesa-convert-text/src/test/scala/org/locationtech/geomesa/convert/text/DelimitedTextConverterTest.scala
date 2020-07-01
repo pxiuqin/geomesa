@@ -78,7 +78,7 @@ class DelimitedTextConverterTest extends Specification {
 
       "correctly identify feature IDs based on lines" >> {
         val hashing = Hashing.md5()
-        res(0).getID mustEqual hashing.hashBytes("1,hello,45.0,45.0".getBytes(StandardCharsets.UTF_8)).toString
+        res(0).getID mustEqual hashing.hashBytes("1,hello,45.0,45.0".getBytes(StandardCharsets.UTF_8)).toString  //生成md5
         res(1).getID mustEqual hashing.hashBytes("2,world,90.0,90.0".getBytes(StandardCharsets.UTF_8)).toString
       }
     }
@@ -769,10 +769,10 @@ class DelimitedTextConverterTest extends Specification {
         """.stripMargin
 
       val factory = new DelimitedTextConverterFactory()
-      val inferred = factory.infer(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)))
+      val inferred = factory.infer(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)))  //推断类型
       inferred must beSome
 
-      val (sft, config) = inferred.get
+      val (sft, config) = inferred.get  //推断出的类型和配置
       sft.getAttributeDescriptors.asScala.map(_.getType.getBinding) mustEqual
           Seq(classOf[Integer], classOf[String], classOf[java.lang.Float], classOf[java.lang.Float], classOf[Point])
 
@@ -818,7 +818,7 @@ class DelimitedTextConverterTest extends Specification {
           |fid-0,name0,0,POINT(40 50)
           |fid-1,name1,1,POINT(41 51)""".stripMargin
       val is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))
-      val features = DelimitedTextConverter.magicParsing("foo", is).toList
+      val features = DelimitedTextConverter.magicParsing("foo", is).toList  //混合schema和数据
       features must haveLength(2)
       foreach(0 to 1) { i =>
         features(i).getID mustEqual s"fid-$i"
@@ -840,7 +840,7 @@ class DelimitedTextConverterTest extends Specification {
           |""".stripMargin
 
       val factory = new DelimitedTextConverterFactory()
-      val inferred = factory.infer(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)))
+      val inferred = factory.infer(new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8)))  //有数据和schema也可以完成推断
       inferred must beSome
 
       val (sft, config) = inferred.get

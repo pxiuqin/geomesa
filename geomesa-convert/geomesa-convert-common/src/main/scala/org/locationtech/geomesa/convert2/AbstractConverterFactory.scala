@@ -94,7 +94,7 @@ object AbstractConverterFactory extends LazyLogging {
   }
 
   /**
-    * Validate an inferred type matches an existing type
+    * Validate an inferred type matches an existing type【验证SFT】
     *
     * @param sft existing type
     * @param types inferred type

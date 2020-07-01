@@ -23,6 +23,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 import scala.annotation.tailrec
 import scala.util.Try
 
+//混合转换
 class CompositeConverter(val targetSft: SimpleFeatureType, delegates: Seq[(Predicate, SimpleFeatureConverter)])
     extends SimpleFeatureConverter {
 

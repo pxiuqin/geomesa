@@ -33,6 +33,7 @@ import pureconfig.{ConfigObjectCursor, ConfigReader}
 
 import scala.util.Try
 
+//基于文本记录，通过分隔符处理
 class DelimitedTextConverterFactory
     extends AbstractConverterFactory[DelimitedTextConverter, DelimitedTextConfig, BasicField, DelimitedTextOptions] {
 
@@ -40,16 +41,16 @@ class DelimitedTextConverterFactory
 
   override protected val typeToProcess: String = DelimitedTextConverterFactory.TypeToProcess
 
-  override protected implicit def configConvert: ConverterConfigConvert[DelimitedTextConfig] = DelimitedTextConfigConvert
-  override protected implicit def fieldConvert: FieldConvert[BasicField] = BasicFieldConvert
-  override protected implicit def optsConvert: ConverterOptionsConvert[DelimitedTextOptions] = DelimitedTextOptionsConvert
+  override protected implicit def configConvert: ConverterConfigConvert[DelimitedTextConfig] = DelimitedTextConfigConvert  //SFT的配置转换
+  override protected implicit def fieldConvert: FieldConvert[BasicField] = BasicFieldConvert  //field转换
+  override protected implicit def optsConvert: ConverterOptionsConvert[DelimitedTextOptions] = DelimitedTextOptionsConvert  //文件转换
 
   override def infer(
       is: InputStream,
       sft: Option[SimpleFeatureType],
       path: Option[String]): Option[(SimpleFeatureType, Config)] = {
     val sampleSize = AbstractConverterFactory.inferSampleSize
-    val lines = IOUtils.lineIterator(is, StandardCharsets.UTF_8.displayName).asScala.take(sampleSize).toSeq
+    val lines = IOUtils.lineIterator(is, StandardCharsets.UTF_8.displayName).asScala.take(sampleSize).toSeq  //获取一个采样数据
     // if only a single line, assume that it isn't actually delimited text
     if (lines.lengthCompare(2) < 0) { None } else {
       magic(lines, sft).orElse(DelimitedTextConverter.inferences.flatMap(infer(_, lines, sft)).headOption)
@@ -72,7 +73,7 @@ class DelimitedTextConverterFactory
     if (counts.isEmpty || counts.lengthCompare(3) > 0 || counts.max < 2) { None } else {
       val names = sft match {
         case Some(s) =>
-          s.getAttributeDescriptors.asScala.map(_.getLocalName)
+          s.getAttributeDescriptors.asScala.map(_.getLocalName)  //获取属性字段
 
         case None =>
           val firstRowTypes = TypeInference.infer(Seq(rows.head))
@@ -81,20 +82,20 @@ class DelimitedTextConverterFactory
             rows.head.map(_.replaceAll("[^A-Za-z0-9]+", "_"))
           }
       }
-      val types = TypeInference.infer(rows.drop(1), names)
+      val types = TypeInference.infer(rows.drop(1), names)  //推断出的类型
       val schema =
         sft.filter(AbstractConverterFactory.validateInferredType(_, types.map(_.typed)))
-            .getOrElse(TypeInference.schema("inferred-delimited-text", types))
+            .getOrElse(TypeInference.schema("inferred-delimited-text", types))  //给定有效的SFT
 
       val converterConfig = DelimitedTextConfig(typeToProcess, formats.find(_._2 == format).get._1,
-        Some(Expression("md5(string2bytes($0))")), Map.empty, Map.empty)
+        Some(Expression("md5(string2bytes($0))")), Map.empty, Map.empty)  //SFT配置转换
 
       val fields = schema.getAttributeDescriptors.asScala.mapWithIndex { case (d, i) =>
         BasicField(d.getLocalName, Some(Expression(types(i).transform(i + 1)))) // 0 is the whole record
-      }
+      } //SF的转换
 
       val options = DelimitedTextOptions(None, CharNotSpecified, CharNotSpecified, None,
-        SimpleFeatureValidator.default, Seq.empty, ParseMode.Default, ErrorMode(), StandardCharsets.UTF_8)
+        SimpleFeatureValidator.default, Seq.empty, ParseMode.Default, ErrorMode(), StandardCharsets.UTF_8)   //文本文件配置选项
 
       val config = configConvert.to(converterConfig)
           .withFallback(fieldConvert.to(fields))
@@ -168,6 +169,7 @@ object DelimitedTextConverterFactory {
 
   val TypeToProcess = "delimited-text"
 
+  //通过配置文件对SFT转换
   object DelimitedTextConfigConvert extends ConverterConfigConvert[DelimitedTextConfig] {
 
     override protected def decodeConfig(

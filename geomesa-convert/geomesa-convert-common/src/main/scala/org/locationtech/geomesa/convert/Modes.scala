@@ -43,6 +43,7 @@ object Modes {
       SystemProperty("geomesa.converter.error.mode.default", defaultValue.toString)
   }
 
+  //转换模式
   object ParseMode extends Enumeration with Modes {
     type Mode = Modes.ParseMode
     val Incremental: ParseMode = Value("incremental")

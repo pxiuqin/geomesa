@@ -22,6 +22,7 @@ import org.opengis.feature.simple.SimpleFeatureType
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import scala.util.Try
 
+//SFT类型推断
 object TypeInference {
 
   import LatLon.{Lat, Lon, NotLatLon}
@@ -35,7 +36,7 @@ object TypeInference {
   private val longitudeNames = Seq("lon", "long", "longitude")
 
   /**
-    * Infer attribute types based on input data
+    * Infer attribute types based on input data【推断类型】
     *
     * @param data rows of columns
     * @param failureRate per column, max percentage of values that can fail a conversion to a particular type,
@@ -276,7 +277,7 @@ object TypeInference {
   }
 
   /**
-    * Get the simple feature type spec binding for a type
+    * Get the simple feature type spec binding for a type【基于枚举类型来转换成类型字符串】
     *
     * @param typed object type
     * @return
@@ -317,7 +318,7 @@ object TypeInference {
   }
 
   /**
-    * Inferred converter transform
+    * Inferred converter transform【隐式转换】
     */
   sealed trait InferredTransform {
 
@@ -394,7 +395,7 @@ object TypeInference {
     private val dateParsers = TransformerFunction.functions.values.collect { case f: StandardDateParser => f }.toArray
 
     /**
-      * Infer a type from a value. Returned type will have an empty name
+      * Infer a type from a value. Returned type will have an empty name【基于值推断类型】
       *
       * @param value value
       * @return

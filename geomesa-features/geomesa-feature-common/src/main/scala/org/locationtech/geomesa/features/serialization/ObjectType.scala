@@ -15,6 +15,7 @@ import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeConfi
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes.AttributeOptions._
 import org.opengis.feature.`type`.AttributeDescriptor
 
+//构建SFT类型的枚举
 object ObjectType extends Enumeration {
 
   type ObjectType = Value
@@ -72,6 +73,7 @@ object ObjectType extends Enumeration {
     }
   }
 
+  //地理信息类型
   private def geometryType(clazz: Class[_ <: Geometry]): Seq[ObjectType] = {
     val subtype = clazz match {
       case c if c == classOf[Point]              => POINT

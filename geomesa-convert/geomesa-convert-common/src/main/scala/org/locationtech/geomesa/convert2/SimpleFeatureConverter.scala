@@ -20,7 +20,7 @@ import org.locationtech.geomesa.utils.io.WithClose
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 /**
-  * Converts input streams into simple features
+  * Converts input streams into simple features【SF转换】
   */
 trait SimpleFeatureConverter extends Closeable with LazyLogging {
 

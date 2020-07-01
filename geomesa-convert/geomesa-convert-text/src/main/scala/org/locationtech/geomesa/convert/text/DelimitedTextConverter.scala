@@ -30,6 +30,7 @@ import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
 import scala.annotation.tailrec
 
+//对文本的转换
 class DelimitedTextConverter(
     sft: SimpleFeatureType,
     config: DelimitedTextConfig,
@@ -74,7 +75,7 @@ class DelimitedTextConverter(
 }
 
 object DelimitedTextConverter {
-
+  //有那些处理的格式
   object Formats {
     val Default          : CSVFormat = CSVFormat.DEFAULT
     val Excel            : CSVFormat = CSVFormat.EXCEL
@@ -89,7 +90,7 @@ object DelimitedTextConverter {
   }
 
   /**
-    * Create a csv format for parsing
+    * Create a csv format for parsing【创建一个format】
     *
     * @param name format name
     * @param options configuration options
@@ -127,7 +128,7 @@ object DelimitedTextConverter {
     * Parses a delimited file with a 'magic' header. The first column must be the feature ID, and the header
     * must be `id`. Subsequent columns must be the feature attributes, in order. For each attribute, the header
     * must be a simple feature type attribute specification, consisting of the attribute name and the attribute
-    * binding
+    * binding  【schema和数据放一起时去解析】
     *
     * For example:
     *
@@ -145,7 +146,7 @@ object DelimitedTextConverter {
                    format: CSVFormat = Formats.QuotedMinimal): CloseableIterator[SimpleFeature] = {
     import scala.collection.JavaConverters._
 
-    val parser = format.parse(new InputStreamReader(is, StandardCharsets.UTF_8))
+    val parser = format.parse(new InputStreamReader(is, StandardCharsets.UTF_8))  //输入转换
     val records = parser.iterator()
 
     val header = if (records.hasNext) { records.next() } else { null }
@@ -154,8 +155,8 @@ object DelimitedTextConverter {
       "Badly formatted file detected - expected header row with attributes")
 
     // drop the 'id' field, at index 0
-    val sftString = (1 until header.size()).map(header.get).mkString(",")
-    val sft = SimpleFeatureTypes.createType(typeName, sftString)
+    val sftString = (1 until header.size()).map(header.get).mkString(",")  //基于文本转换成字符串格式
+    val sft = SimpleFeatureTypes.createType(typeName, sftString)  //创建SFT
 
     val converters = sft.getAttributeDescriptors.asScala.map { ad =>
       import org.locationtech.geomesa.utils.geotools.RichAttributeDescriptors.RichAttributeDescriptor
@@ -181,12 +182,13 @@ object DelimitedTextConverter {
         i += 1
       }
       // we can use the no-convert constructor since we've already converted everything
-      new ScalaSimpleFeature(sft, record.get(0), attributes)
+      new ScalaSimpleFeature(sft, record.get(0), attributes)  //构建SF
     }
 
     CloseableIterator(features, parser.close())
   }
 
+  //基于文本格式
   private [text] val formats = Map(
     "CSV"                      -> Formats.Default,
     "DEFAULT"                  -> Formats.Default,
@@ -204,8 +206,9 @@ object DelimitedTextConverter {
   )
 
   // check quoted before default - if values are quoted, we don't want the quotes to be captured as part of the value
-  private [text] val inferences = Stream(Formats.Tabs, Formats.Quoted, Formats.Default)
+  private [text] val inferences = Stream(Formats.Tabs, Formats.Quoted, Formats.Default)   //给定一个默认的推断格式
 
+  //SFT文本的配置文件情况
   case class DelimitedTextConfig(
       `type`: String,
       format: String,
@@ -214,6 +217,7 @@ object DelimitedTextConverter {
       userData: Map[String, Expression]
     ) extends ConverterConfig
 
+  //分隔文本文件的配置选项【读取文件时配置选项】
   case class DelimitedTextOptions(
       skipLines: Option[Int],
       quote: OptionalChar,
@@ -253,7 +257,7 @@ object DelimitedTextConverter {
       extends CloseableIterator[CSVRecord] {
 
     private val parser = format.parse(new InputStreamReader(is, encoding))
-    private val records = parser.iterator()
+    private val records = parser.iterator() //构建迭代器
     private var lastLine = 0L
     private var staged: CSVRecord = _
 
@@ -273,9 +277,9 @@ object DelimitedTextConverter {
           lastLine = line
         }
         if (lastLine <= skip) {
-          hasNext
+          hasNext  //跳过指定行记录
         } else {
-          staged = record
+          staged = record  //需要读取记录
           true
         }
       }
