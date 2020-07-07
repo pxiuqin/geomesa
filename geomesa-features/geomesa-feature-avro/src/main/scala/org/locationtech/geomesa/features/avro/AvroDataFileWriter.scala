@@ -30,8 +30,8 @@ class AvroDataFileWriter(os: OutputStream,
                          compression: Int = Deflater.DEFAULT_COMPRESSION) extends Closeable with Flushable {
 
   private val schema = AvroSimpleFeatureUtils.generateSchema(sft, withUserData = true, withFeatureId = true, namespace = sft.getName.getNamespaceURI)
-  private val writer = new AvroSimpleFeatureWriter(sft, SerializationOptions.withUserData)
-  private val dfw    = new DataFileWriter[SimpleFeature](writer)
+  private val writer = new AvroSimpleFeatureWriter(sft, SerializationOptions.withUserData)  //构建avro格式的SF
+  private val dfw    = new DataFileWriter[SimpleFeature](writer)  //使用avro写入
 
   if (compression != Deflater.NO_COMPRESSION) {
     dfw.setCodec(CodecFactory.deflateCodec(compression))

@@ -106,7 +106,7 @@ object SimpleFeatureConverter extends StrictLogging {
   }
 
   /**
-    * Infer a converter based on a data sample
+    * Infer a converter based on a data sample【通过数据推断Converter】
     *
     * @param is input stream to convert
     * @param sft simple feature type, if known

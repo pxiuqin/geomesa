@@ -17,6 +17,7 @@ import org.locationtech.geomesa.features.SerializationOption.SerializationOption
 import org.locationtech.geomesa.features.avro.serialization.AvroUserDataSerialization
 import org.opengis.feature.simple.{SimpleFeature, SimpleFeatureType}
 
+//SF转换成AVRO的格式
 class AvroSimpleFeatureWriter(sft: SimpleFeatureType, opts: Set[SerializationOption] = Set.empty)
   extends DatumWriter[SimpleFeature] {
 
