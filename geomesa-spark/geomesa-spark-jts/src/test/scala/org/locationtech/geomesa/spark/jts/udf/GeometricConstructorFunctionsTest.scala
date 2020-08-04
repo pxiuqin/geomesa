@@ -124,6 +124,23 @@ class GeometricConstructorFunctionsTest extends Specification with TestEnvironme
       dfBlank.select(st_geomFromWKT(point)).first mustEqual expected
     }
 
+    "st_geomFromWKT With Z Value" >> {
+
+      val point = "POINT(1 1 1)"
+      val r = sc.sql(
+        s"""
+           |select st_geomFromWKT('$point')
+        """.stripMargin
+      )
+
+      val expected = WKTUtils.read(point)
+
+      foreach(Seq(r.collect().head.getAs[Geometry](0), dfBlank.select(st_geomFromWKT(point)).first)) { actual =>
+        actual must beAnInstanceOf[Point]
+        actual.asInstanceOf[Point].getCoordinate.getZ mustEqual 1
+      }
+    }
+
     "st_geometryFromText" >> {
       sc.sql("select st_geometryFromText(null)").collect.head(0) must beNull
 

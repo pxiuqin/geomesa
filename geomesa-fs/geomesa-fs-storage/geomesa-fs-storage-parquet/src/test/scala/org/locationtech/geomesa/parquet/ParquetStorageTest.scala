@@ -101,7 +101,6 @@ class ParquetStorageTest extends Specification with AllExpectations with LazyLog
 
         // verify we can load an existing storage
         val loaded = new FileBasedMetadataFactory().load(context)
-        loaded.foreach(_.reload()) // ensure state is loaded
         loaded must beSome
         testQuery(new ParquetFileSystemStorageFactory().apply(context, loaded.get), sft)("INCLUDE", null, features)
       }
@@ -111,7 +110,7 @@ class ParquetStorageTest extends Specification with AllExpectations with LazyLog
       val sft = SimpleFeatureTypes.createType("parquet-test-complex",
         "name:String,age:Int,time:Long,height:Float,weight:Double,bool:Boolean," +
             "uuid:UUID,bytes:Bytes,list:List[Int],map:Map[String,Long]," +
-            "line:LineString,mpt:MultiPoint,poly:Polygon,mline:MultiLineString,mpoly:MultiPolygon," +
+            "line:LineString,mpt:MultiPoint,poly:Polygon,mline:MultiLineString,mpoly:MultiPolygon,g:Geometry," +
             "dtg:Date,*geom:Point:srid=4326")
 
       val features = (0 until 10).map { i =>
@@ -139,6 +138,7 @@ class ParquetStorageTest extends Specification with AllExpectations with LazyLog
         )
         sf.setAttribute("mline", s"MULTILINESTRING((0 2, 2 $i, 8 6),(0 $i, 2 $i, 8 ${10 - i}))")
         sf.setAttribute("mpoly", s"MULTIPOLYGON(((-1 0, 0 $i, 1 0, 0 -1, -1 0)), ((-2 6, 1 6, 1 3, -2 3, -2 6), (-1 5, 2 5, 2 2, -1 2, -1 5)))")
+        sf.setAttribute("g", sf.getAttribute(Seq("line", "mpt", "poly", "mline", "mpoly").drop(i % 5).head))
         sf.setAttribute("dtg", f"2014-01-${i + 1}%02dT00:00:01.000Z")
         sf.setAttribute("geom", s"POINT(4$i 5$i)")
         sf
@@ -320,7 +320,6 @@ class ParquetStorageTest extends Specification with AllExpectations with LazyLog
       val context = FileSystemContext(FileContext.getFileContext(url.toURI), config, path)
       val metadata = StorageMetadataFactory.load(context).orNull
       metadata must not(beNull)
-      metadata.reload() // ensure metadata is loaded
       val storage = FileSystemStorageFactory(context, metadata)
 
       val features = SelfClosingIterator(storage.getReader(new Query("example-csv"))).toList.sortBy(_.getID)

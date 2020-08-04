@@ -48,6 +48,25 @@ class GeometricOutputFunctionsTest extends Specification with TestEnvironment {
       dfBlank.select(st_asBinary(st_geomFromWKT("POLYGON((0 0, 2 0, 2 2, 0 2, 0 0))"))).first mustEqual expected
     }
 
+    "st_asBinary with 3 dimensions" >> {
+
+      val r = sc.sql(
+        """
+          |select st_asBinary(st_geomFromWKT('POLYGON((0 0 1, 2 0 1, 2 2 1, 0 2 1, 0 0 1))'))
+        """.stripMargin
+      )
+      val expected = Array[Byte](0, -128, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 63, -16, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 63, -16, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 63, -16, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 63, -16, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, -16, 0, 0, 0, 0, 0, 0
+      )
+
+      r.collect().head.getAs[Array[Byte]](0) mustEqual expected
+
+      dfBlank.select(st_asBinary(st_geomFromWKT("POLYGON((0 0 1, 2 0 1, 2 2 1, 0 2 1, 0 0 1))"))).first mustEqual expected
+    }
+
     "st_asGeoJSON" >> {
       "null" >> {
         sc.sql("select st_asGeoJSON(null)").collect.head(0) must beNull

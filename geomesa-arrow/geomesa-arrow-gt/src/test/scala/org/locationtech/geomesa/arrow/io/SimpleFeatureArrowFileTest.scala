@@ -12,6 +12,7 @@ import java.io.{File, FileInputStream, FileOutputStream}
 import java.nio.file.Files
 import java.util.concurrent.atomic.AtomicInteger
 
+import org.apache.arrow.vector.ipc.message.IpcOption
 import org.geotools.filter.text.ecql.ECQL
 import org.junit.runner.RunWith
 import org.locationtech.geomesa.arrow.vector.ArrowDictionary
@@ -19,7 +20,8 @@ import org.locationtech.geomesa.arrow.vector.SimpleFeatureVector.SimpleFeatureEn
 import org.locationtech.geomesa.features.ScalaSimpleFeature
 import org.locationtech.geomesa.utils.geotools.SimpleFeatureTypes
 import org.locationtech.geomesa.utils.io.WithClose
-import org.locationtech.jts.geom.LineString
+import org.locationtech.geomesa.utils.text.{WKBUtils, WKTUtils}
+import org.locationtech.jts.geom.{Geometry, LineString, Point, Polygon}
 import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
@@ -31,6 +33,7 @@ class SimpleFeatureArrowFileTest extends Specification {
 
   val sft = SimpleFeatureTypes.createImmutableType("test", "name:String,foo:String,age:Int,dtg:Date,*geom:Point:srid=4326")
   val lineSft = SimpleFeatureTypes.createType("test", "name:String,team:String,age:Int,weight:Int,dtg:Date,*geom:LineString:srid=4326")
+  val geomSft = SimpleFeatureTypes.createType("test", "name:String,team:String,age:Int,weight:Int,dtg:Date,*geom:Geometry:srid=4326")
 
   val features0 = (0 until 10).map { i =>
     ScalaSimpleFeature.create(sft, s"0$i", s"name0$i", s"foo${i % 2}", s"${i % 5}", s"2017-03-15T00:0$i:00.000Z", s"POINT (4$i 5$i)")
@@ -46,6 +49,18 @@ class SimpleFeatureArrowFileTest extends Specification {
     val geom = s"LINESTRING(40 6$i, 40.1 6$i, 40.2 6$i, 40.3 6$i)"
     ScalaSimpleFeature.create(lineSft, s"$i", name, team, age, weight, s"2017-02-03T00:0$i:01.000Z", geom)
   }
+  val points: Seq[Geometry] = Seq("POINT(0 0)", "POINT(1 1)", "POINT(2 2)", "POINT(3 3)", "POINT(4 4)").map(WKTUtils.read)
+  val polys = points.map(_.buffer(1))
+  val geoms = (points ++ polys).toArray
+  val geomFeatures = (0 until 10).map { i =>
+    val name = s"name${i % 2}"
+    val team = s"team$i"
+    val age = i % 5
+    val weight = Option(i % 3).filter(_ != 0).map(Int.box).orNull
+    ScalaSimpleFeature.create(geomSft, s"$i", name, team, age, weight, s"2017-02-03T00:0$i:01.000Z", geoms(i))
+  }
+
+  val ipcOpts = new IpcOption() // TODO test legacy opts
 
   // note: we clone the features before comparing them as they aren't valid once 'next' is called again,
   // and specs doesn't have methods for comparing iterators
@@ -53,7 +68,7 @@ class SimpleFeatureArrowFileTest extends Specification {
   "SimpleFeatureArrowFiles" should {
     "write and read just a schema" >> {
       withTestFile("empty") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, encoding = SimpleFeatureEncoding.Max))(_.flush())
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, Map.empty, SimpleFeatureEncoding.Max, ipcOpts, None))(_.flush())
         WithClose(SimpleFeatureArrowFileReader.streaming(() => new FileInputStream(file))) { reader =>
           reader.sft mustEqual sft
           reader.features().toSeq must beEmpty
@@ -66,7 +81,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     }
     "write and read and filter values" >> {
       withTestFile("simple") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, encoding = SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, Map.empty, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features0.foreach(writer.add)
           writer.flush()
           features1.foreach(writer.add)
@@ -89,7 +104,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     }
     "optimize queries for sorted files" >> {
       withTestFile("sorted") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, encoding = SimpleFeatureEncoding.Max, sort = Some(("dtg", false)))) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, Map.empty, SimpleFeatureEncoding.Max, ipcOpts, Some(("dtg", false)))) { writer =>
           features0.foreach(writer.add)
           writer.flush()
           features1.foreach(writer.add)
@@ -112,10 +127,10 @@ class SimpleFeatureArrowFileTest extends Specification {
     }
     "write and read multiple logical files in one" >> {
       withTestFile("multi-files") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, encoding = SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, Map.empty, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features0.foreach(writer.add)
         }
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file, true), sft, encoding = SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file, true), sft, Map.empty, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features1.foreach(writer.add)
         }
         WithClose(SimpleFeatureArrowFileReader.streaming(() => new FileInputStream(file))) { reader =>
@@ -138,7 +153,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     "write and read dictionary encoded values" >> {
       val dictionaries = Map("foo:String" -> ArrowDictionary.create(0, Array("foo0", "foo1", "foo2")))
       withTestFile("dictionary") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features0.foreach(writer.add)
           writer.flush()
           features1.foreach(writer.add)
@@ -154,7 +169,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     "write and read dictionary encoded ints" >> {
       val dictionaries = Map("age" -> ArrowDictionary.create(0, Array(0, 1, 2, 3, 4, 5).map(Int.box)))
       withTestFile("dictionary-int") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features0.foreach(writer.add)
           writer.flush()
           features1.foreach(writer.add)
@@ -170,7 +185,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     "write and read dictionary encoded values with defaults" >> {
       val dictionaries = Map("foo" -> ArrowDictionary.create(0, Array("foo0", "foo1")))
       withTestFile("dictionary-defaults") { file =>
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), sft, dictionaries, SimpleFeatureEncoding.Max, ipcOpts, None)) { writer =>
           features0.foreach(writer.add)
           writer.flush()
           features1.foreach(writer.add)
@@ -193,7 +208,7 @@ class SimpleFeatureArrowFileTest extends Specification {
     "write and read linestrings" >> {
       withTestFile("lines") { file =>
         val encoding = SimpleFeatureEncoding.min(includeFids = true)
-        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), lineSft, Map.empty, encoding)) { writer =>
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), lineSft, Map.empty, encoding, ipcOpts, None)) { writer =>
           lineFeatures.foreach(writer.add)
         }
         def testReader(reader: SimpleFeatureArrowFileReader): MatchResult[Any] = {
@@ -210,6 +225,39 @@ class SimpleFeatureArrowFileTest extends Specification {
                 r.getCoordinateN(n).x must beCloseTo(f.getCoordinateN(n).x, 0.001)
                 r.getCoordinateN(n).y must beCloseTo(f.getCoordinateN(n).y, 0.001)
               }
+          }
+        }
+        WithClose(SimpleFeatureArrowFileReader.streaming(() => new FileInputStream(file)))(testReader)
+        WithClose(SimpleFeatureArrowFileReader.caching(new FileInputStream(file)))(testReader)
+      }
+    }
+
+    "write and read geometries" >> {
+      withTestFile("geometries") { file =>
+        val encoding = SimpleFeatureEncoding.min(includeFids = true)
+        WithClose(SimpleFeatureArrowFileWriter(new FileOutputStream(file), geomSft, Map.empty, encoding, ipcOpts, None)) {
+          writer =>
+            geomFeatures.foreach(writer.add)
+        }
+        def testReader(reader: SimpleFeatureArrowFileReader): MatchResult[Any] = {
+          val read = WithClose(reader.features())(f => f.map(ScalaSimpleFeature.copy).toList)
+          read.map(_.getID) mustEqual geomFeatures.map(_.getID)
+          forall(0 until geomSft.getAttributeCount - 1) { i =>
+            read.map(_.getAttribute(i)) mustEqual geomFeatures.map(_.getAttribute(i))
+          }
+          forall(read.map(_.getDefaultGeometry()).zip(geomFeatures.map(_.getDefaultGeometry))) {
+            case (r: Point, f: Point) =>
+              r.getX must beCloseTo(f.getX, delta=0.001)
+              r.getY must beCloseTo(f.getY, delta=0.001)
+            case (r: Polygon, f: Polygon) =>
+              // because of our limited precision in arrow queries, points don't exactly match up
+              r.getNumPoints mustEqual f.getNumPoints
+              foreach(0 until r.getNumPoints) { n =>
+                r.getExteriorRing.getCoordinateN(n).x must beCloseTo(r.getExteriorRing.getCoordinateN(n).x, delta=0.001)
+                r.getExteriorRing.getCoordinateN(n).y must beCloseTo(r.getExteriorRing.getCoordinateN(n).y, delta=0.001)
+              }
+            case (a, b) => 
+              ko
           }
         }
         WithClose(SimpleFeatureArrowFileReader.streaming(() => new FileInputStream(file)))(testReader)

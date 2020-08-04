@@ -83,5 +83,5 @@ class CompositeConverter(val targetSft: SimpleFeatureType, delegates: Seq[(Predi
     }
   }
 
-  override def close(): Unit = converters.foreach(CloseWithLogging.apply)
+  override def close(): Unit = CloseWithLogging(converters)
 }
