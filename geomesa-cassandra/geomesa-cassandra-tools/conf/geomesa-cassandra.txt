@@ -1,0 +1,22 @@
+﻿bin/geomesa-cassandra ingest \
+    --contact-point 127.0.0.1:9042 \
+    --key-space geomesa \
+    --catalog geolife \
+    --converter geolife \
+    --threads 50 \
+    --spec /home/data/user/lxq/packages/geomesa-cassandra_2.11-2.4.1/conf/sfts/geolife/reference.conf \
+    /home/data/user/lxq/packages/geomesa-cassandra_2.11-2.4.1/data/geolife/Data/*/*/*
+
+
+
+GEOMESA_CASSANDRA_HOME=/home/data/user/lxq/packages/geomesa-cassandra_2.11-2.4.1
+
+
+bin/geomesa-cassandra ingest \
+    --contact-point 127.0.0.1:9042 \
+    --key-space geomesa \
+    --catalog gdelt2 \
+    --converter gdelt \
+    --threads 4 \
+    --spec /home/data/user/lxq/packages/geomesa-cassandra_2.11-2.4.1/conf/sfts/gdelt/reference.conf \
+/home/data/user/lxq/packages/geomesa-cassandra_2.11-2.4.1/data/gdelt/20200101.export.CSV

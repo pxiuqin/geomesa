@@ -130,6 +130,7 @@ object CassandraDataStoreFactory extends GeoMesaDataStoreInfo {
   override val DisplayName = "Cassandra (GeoMesa)"
   override val Description = "Apache Cassandra\u2122 distributed key/value store"
 
+  //cassandra存储使用的参数
   override val ParameterInfo: Array[GeoMesaParam[_]] =
     Array(
       Params.ContactPointParam,
